@@ -1,0 +1,1783 @@
+openapi: 3.0.3
+info:
+  title: Redstick Ventures Command Center API
+  description: |
+    Complete API for the Redstick Ventures Command Center platform.
+    
+    ## Authentication
+    All API requests require a JWT token in the Authorization header:
+    ```
+    Authorization: Bearer <token>
+    ```
+    
+    ## Rate Limiting
+    - Authenticated: 1000 requests/minute
+    - Unauthenticated: 20 requests/minute
+    
+    ## Base URLs
+    - Production: https://api.redstick.vc
+    - Staging: https://api-staging.redstick.vc
+    - Development: http://localhost:3000/api
+  version: 1.0.0
+  contact:
+    name: Redstick API Support
+    email: api-support@redstick.vc
+    url: https://docs.redstick.vc
+  license:
+    name: Proprietary
+    url: https://redstick.vc/terms
+
+servers:
+  - url: https://api.redstick.vc/api/v1
+    description: Production
+  - url: https://api-staging.redstick.vc/api/v1
+    description: Staging
+  - url: http://localhost:3000/api/v1
+    description: Development
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and obtain access tokens
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Reset email sent
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - password
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                  minLength: 8
+      responses:
+        '200':
+          description: Password reset successful
+
+  # Deals
+  /deals:
+    get:
+      tags:
+        - Deals
+      summary: List all deals
+      description: Get a paginated list of deals with filtering and sorting
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortByParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: stage
+          in: query
+          schema:
+            type: string
+            enum: [lead, qualified, pitch, duediligence, negotiation, closed, passed]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, onhold, archived]
+        - name: assignedTo
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: minAmount
+          in: query
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          schema:
+            type: number
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: include
+          in: query
+          schema:
+            type: string
+            description: Comma-separated list of related data to include
+      responses:
+        '200':
+          description: List of deals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Deals
+      summary: Create a new deal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDealRequest'
+      responses:
+        '201':
+          description: Deal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /deals/{id}:
+    get:
+      tags:
+        - Deals
+      summary: Get a specific deal
+      parameters:
+        - $ref: '#/components/parameters/DealIdParam'
+        - name: include
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Deals
+      summary: Update a deal
+      parameters:
+        - $ref: '#/components/parameters/DealIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDealRequest'
+      responses:
+        '200':
+          description: Deal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Deals
+      summary: Delete/archive a deal
+      parameters:
+        - $ref: '#/components/parameters/DealIdParam'
+        - name: permanent
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Deal deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /deals/{id}/activities:
+    post:
+      tags:
+        - Deals
+        - Activities
+      summary: Add activity to deal
+      parameters:
+        - $ref: '#/components/parameters/DealIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActivityRequest'
+      responses:
+        '201':
+          description: Activity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+
+  # Companies
+  /companies:
+    get:
+      tags:
+        - Companies
+      summary: List all companies
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: industry
+          in: query
+          schema:
+            type: string
+        - name: stage
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: hasDeal
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of companies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyListResponse'
+
+    post:
+      tags:
+        - Companies
+      summary: Create a new company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompanyRequest'
+      responses:
+        '201':
+          description: Company created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyResponse'
+
+  /companies/{id}:
+    get:
+      tags:
+        - Companies
+      summary: Get a specific company
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdParam'
+      responses:
+        '200':
+          description: Company details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Companies
+      summary: Update a company
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCompanyRequest'
+      responses:
+        '200':
+          description: Company updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyResponse'
+
+    delete:
+      tags:
+        - Companies
+      summary: Delete a company
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdParam'
+      responses:
+        '200':
+          description: Company deleted
+
+  # Agents
+  /agents:
+    get:
+      tags:
+        - Agents
+      summary: List all agents
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive]
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentListResponse'
+
+  /agents/{id}:
+    get:
+      tags:
+        - Agents
+      summary: Get agent details
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDetailResponse'
+
+  /agents/{id}/run:
+    post:
+      tags:
+        - Agents
+      summary: Execute an agent
+      parameters:
+        - $ref: '#/components/parameters/AgentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunAgentRequest'
+      responses:
+        '202':
+          description: Agent run queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentRunQueuedResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+
+  /agents/runs:
+    get:
+      tags:
+        - Agents
+      summary: List agent run history
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: agentId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [queued, running, paused, completed, failed, cancelled]
+      responses:
+        '200':
+          description: List of agent runs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentRunListResponse'
+
+  /agents/runs/{runId}:
+    get:
+      tags:
+        - Agents
+      summary: Get agent run status and results
+      parameters:
+        - $ref: '#/components/parameters/RunIdParam'
+      responses:
+        '200':
+          description: Agent run details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentRunDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /agents/runs/{runId}/cancel:
+    post:
+      tags:
+        - Agents
+      summary: Cancel a running agent
+      parameters:
+        - $ref: '#/components/parameters/RunIdParam'
+      responses:
+        '200':
+          description: Agent run cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  # Users
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List all users
+      description: Admin only
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, pending]
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /users/me:
+    get:
+      tags:
+        - Users
+      summary: Get current user profile
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+    patch:
+      tags:
+        - Users
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+    patch:
+      tags:
+        - Users
+      summary: Update user
+      description: Admin only
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+    delete:
+      tags:
+        - Users
+      summary: Deactivate user
+      description: Admin only
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User deactivated
+
+  # Dashboard
+  /dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard data
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [week, month, quarter, year]
+            default: month
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+
+  # Notifications
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get user notifications
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationListResponse'
+
+  /notifications/{id}/read:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification marked as read
+
+  /notifications/read-all:
+    post:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      responses:
+        '200':
+          description: All notifications marked as read
+
+  # Files
+  /files/upload:
+    post:
+      tags:
+        - Files
+      summary: Upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                folder:
+                  type: string
+                metadata:
+                  type: string
+                  description: JSON string of metadata
+      responses:
+        '201':
+          description: File uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /files/{id}:
+    get:
+      tags:
+        - Files
+      summary: Get file details
+      parameters:
+        - $ref: '#/components/parameters/FileIdParam'
+      responses:
+        '200':
+          description: File details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileResponse'
+
+    delete:
+      tags:
+        - Files
+      summary: Delete a file
+      parameters:
+        - $ref: '#/components/parameters/FileIdParam'
+      responses:
+        '200':
+          description: File deleted
+
+  /files/{id}/download:
+    get:
+      tags:
+        - Files
+      summary: Get download URL for file
+      parameters:
+        - $ref: '#/components/parameters/FileIdParam'
+      responses:
+        '200':
+          description: Download URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      expiresAt:
+                        type: string
+                        format: date-time
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+
+    SortByParam:
+      name: sortBy
+      in: query
+      schema:
+        type: string
+        default: createdAt
+
+    SortOrderParam:
+      name: sortOrder
+      in: query
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+
+    DealIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Deal ID
+
+    CompanyIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Company ID
+
+    AgentIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Agent ID
+
+    RunIdParam:
+      name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Agent run ID
+
+    UserIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: User ID
+
+    FileIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: File ID
+
+  schemas:
+    # Base Response
+    SuccessResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+
+    # Pagination
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+        hasNextPage:
+          type: boolean
+        hasPrevPage:
+          type: boolean
+
+    # User
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, inactive, pending]
+        avatar:
+          type: string
+          format: uri
+        department:
+          type: string
+        title:
+          type: string
+        phone:
+          type: string
+        lastLoginAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    UserResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/User'
+
+    UserListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        avatar:
+          type: string
+        department:
+          type: string
+        title:
+          type: string
+        phone:
+          type: string
+
+    # Authentication
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        mfaCode:
+          type: string
+
+    LoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/User'
+                tokens:
+                  $ref: '#/components/schemas/Tokens'
+
+    Tokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        accessTokenExpires:
+          type: string
+          format: date-time
+        refreshTokenExpires:
+          type: string
+          format: date-time
+
+    TokenResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Tokens'
+
+    # Deal
+    Deal:
+      type: object
+      required:
+        - id
+        - companyName
+        - stage
+      properties:
+        id:
+          type: string
+        companyId:
+          type: string
+        companyName:
+          type: string
+        stage:
+          type: string
+          enum: [lead, qualified, pitch, duediligence, negotiation, closed, passed]
+        status:
+          type: string
+          enum: [active, onhold, archived]
+        amount:
+          type: number
+        description:
+          type: string
+        source:
+          type: string
+        sourceDetail:
+          type: string
+        probability:
+          type: number
+          minimum: 0
+          maximum: 100
+        expectedCloseDate:
+          type: string
+          format: date
+        assignedTo:
+          type: string
+        assignee:
+          $ref: '#/components/schemas/User'
+        tags:
+          type: array
+          items:
+            type: string
+        customFields:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        lastActivityAt:
+          type: string
+          format: date-time
+
+    DealResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Deal'
+
+    DealListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Deal'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    DealDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/DealResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                company:
+                  $ref: '#/components/schemas/Company'
+                activities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Activity'
+                documents:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/File'
+                notes:
+                  type: array
+                  items:
+                    type: object
+                tasks:
+                  type: array
+                  items:
+                    type: object
+
+    CreateDealRequest:
+      type: object
+      required:
+        - companyName
+        - stage
+      properties:
+        companyName:
+          type: string
+        companyId:
+          type: string
+        stage:
+          type: string
+          enum: [lead, qualified, pitch, duediligence, negotiation, closed, passed]
+        status:
+          type: string
+          enum: [active, onhold, archived]
+        amount:
+          type: number
+        description:
+          type: string
+        source:
+          type: string
+        sourceDetail:
+          type: string
+        probability:
+          type: number
+        expectedCloseDate:
+          type: string
+          format: date
+        assignedTo:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        customFields:
+          type: object
+
+    UpdateDealRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateDealRequest'
+      type: object
+
+    # Company
+    Company:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        website:
+          type: string
+          format: uri
+        industry:
+          type: string
+        subIndustry:
+          type: string
+        stage:
+          type: string
+        foundedYear:
+          type: integer
+        employees:
+          type: integer
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+        socialLinks:
+          type: object
+          properties:
+            linkedin:
+              type: string
+            twitter:
+              type: string
+        founders:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              title:
+                type: string
+              linkedin:
+                type: string
+        fundingHistory:
+          type: array
+          items:
+            type: object
+        metrics:
+          type: object
+          properties:
+            revenue:
+              type: number
+            growthRate:
+              type: number
+            customers:
+              type: integer
+        dealCount:
+          type: integer
+        activeDealId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CompanyResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Company'
+
+    CompanyListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Company'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    CompanyDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/CompanyResponse'
+
+    CreateCompanyRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        website:
+          type: string
+        industry:
+          type: string
+        subIndustry:
+          type: string
+        stage:
+          type: string
+        foundedYear:
+          type: integer
+        employees:
+          type: integer
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+            state:
+              type: string
+            country:
+              type: string
+        socialLinks:
+          type: object
+        founders:
+          type: array
+          items:
+            type: object
+
+    UpdateCompanyRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateCompanyRequest'
+      type: object
+
+    # Agent
+    Agent:
+      type: object
+      required:
+        - id
+        - name
+        - status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        icon:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+        capabilities:
+          type: array
+          items:
+            type: string
+        inputSchema:
+          type: object
+        outputSchema:
+          type: object
+        avgExecutionTime:
+          type: integer
+          description: Average execution time in seconds
+        successRate:
+          type: number
+          description: Success rate between 0 and 1
+        createdAt:
+          type: string
+          format: date-time
+
+    AgentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Agent'
+
+    AgentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Agent'
+
+    AgentDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/AgentResponse'
+
+    RunAgentRequest:
+      type: object
+      required:
+        - inputs
+      properties:
+        inputs:
+          type: object
+        callbackUrl:
+          type: string
+          format: uri
+        metadata:
+          type: object
+
+    AgentRun:
+      type: object
+      properties:
+        id:
+          type: string
+        agentId:
+          type: string
+        agentName:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, paused, completed, failed, cancelled]
+        inputs:
+          type: object
+        outputs:
+          type: object
+        logs:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              level:
+                type: string
+              message:
+                type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+        createdBy:
+          type: string
+
+    AgentRunQueuedResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                runId:
+                  type: string
+                agentId:
+                  type: string
+                status:
+                  type: string
+                estimatedCompletion:
+                  type: string
+                  format: date-time
+                queuePosition:
+                  type: integer
+
+    AgentRunDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AgentRun'
+
+    AgentRunListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AgentRun'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    # Activity
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [meeting, call, email, note, task, document, status_change]
+        title:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: string
+        outcome:
+          type: string
+        nextSteps:
+          type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateActivityRequest:
+      type: object
+      required:
+        - type
+        - title
+      properties:
+        type:
+          type: string
+          enum: [meeting, call, email, note, task, document, status_change]
+        title:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: string
+        outcome:
+          type: string
+        nextSteps:
+          type: string
+
+    ActivityResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Activity'
+
+    # Dashboard
+    DashboardResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                pipeline:
+                  type: object
+                  properties:
+                    totalDeals:
+                      type: integer
+                    totalValue:
+                      type: number
+                    byStage:
+                      type: object
+                      additionalProperties:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          value:
+                            type: number
+                activities:
+                  type: object
+                  properties:
+                    totalThisPeriod:
+                      type: integer
+                    byType:
+                      type: object
+                      additionalProperties:
+                        type: integer
+                agents:
+                  type: object
+                  properties:
+                    activeRuns:
+                      type: integer
+                    completedToday:
+                      type: integer
+                    avgExecutionTime:
+                      type: integer
+                upcoming:
+                  type: array
+                  items:
+                    type: object
+
+    # Notification
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        data:
+          type: object
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Notification'
+            unreadCount:
+              type: integer
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    # File
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        originalName:
+          type: string
+        mimeType:
+          type: string
+        size:
+          type: integer
+        url:
+          type: string
+          format: uri
+        thumbnailUrl:
+          type: string
+          format: uri
+        uploadedBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    FileResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/File'
+
+    # Error
+    Error:
+      type: object
+      required:
+        - success
+        - error
+        - code
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+        code:
+          type: string
+        details:
+          type: object
+        requestId:
+          type: string
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Invalid or missing token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error: "Invalid or missing authentication token"
+            code: "UNAUTHORIZED"
+            requestId: "req_abc123"
+
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error: "Insufficient permissions"
+            code: "FORBIDDEN"
+            requestId: "req_def456"
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error: "Resource not found"
+            code: "NOT_FOUND"
+            requestId: "req_ghi789"
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error: "Validation failed"
+            code: "VALIDATION_ERROR"
+            details:
+              companyName: ["Company name is required"]
+            requestId: "req_jkl012"
+
+    ConflictError:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error: "Deal already exists for this company"
+            code: "DUPLICATE_RESOURCE"
+            requestId: "req_mno345"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error: "Rate limit exceeded"
+            code: "RATE_LIMIT_EXCEEDED"
+            details:
+              retryAfter: 60
+            requestId: "req_pqr678"

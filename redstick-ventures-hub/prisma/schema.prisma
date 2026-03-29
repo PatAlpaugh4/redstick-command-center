@@ -1,0 +1,410 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model with role-based access
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?   // For credentials auth
+  role          UserRole  @default(VISITOR)
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  deals         Deal[]    @relation("DealAssignee")
+  activities    Activity[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Deal pipeline for VC fund operations
+model Deal {
+  id              String      @id @default(cuid())
+  companyName     String
+  description     String?
+  website         String?
+  status          DealStatus  @default(SOURCED)
+  stage           DealStage   @default(SEED)
+  sector          String?
+  location        String?
+  fundSize        Decimal?    @db.Decimal(12, 2)
+  valuation       Decimal?    @db.Decimal(12, 2)
+  investmentAmount Decimal?   @db.Decimal(12, 2)
+  ownershipStake  Decimal?    @db.Decimal(5, 2)
+  foundedYear     Int?
+  teamSize        Int?
+  arr             Decimal?    @db.Decimal(12, 2)
+  mrr             Decimal?    @db.Decimal(12, 2)
+  growthRate      Decimal?    @db.Decimal(5, 2)
+  notes           String?
+  priority        Priority    @default(MEDIUM)
+  source          String?     // How the deal was sourced
+  contactedAt     DateTime?
+  pitchDate       DateTime?
+  icDate          DateTime?   // Investment Committee date
+  expectedClose   DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  assigneeId      String?
+  assignee        User?       @relation("DealAssignee", fields: [assigneeId], references: [id])
+  activities      Activity[]
+  documents       Document[]
+  company         Company?    @relation(fields: [companyId], references: [id])
+  companyId       String?
+
+  @@map("deals")
+}
+
+// Portfolio companies
+model Company {
+  id              String         @id @default(cuid())
+  name            String
+  slug            String         @unique
+  description     String?
+  website         String?
+  logo            String?
+  sector          String
+  stage           CompanyStage   @default(SEED)
+  location        String?
+  foundedYear     Int?
+  teamSize        Int?
+  arr             Decimal?       @db.Decimal(12, 2)
+  mrr             Decimal?       @db.Decimal(12, 2)
+  growthRate      Decimal?       @db.Decimal(5, 2)
+  burnRate        Decimal?       @db.Decimal(12, 2)
+  runway          Int?           // Months
+  investmentDate  DateTime?
+  investmentAmount Decimal?      @db.Decimal(12, 2)
+  currentValuation Decimal?      @db.Decimal(12, 2)
+  ownershipStake  Decimal?       @db.Decimal(5, 2)
+  status          CompanyStatus  @default(ACTIVE)
+  healthScore     Int?           @default(80) // 0-100
+  esgScore        Int?           @default(50) // 0-100
+  boardSeat       Boolean        @default(false)
+  lastCheckIn     DateTime?
+  nextMilestone   String?
+  nextMilestoneDate DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relations
+  deals           Deal[]
+  founders        Founder[]
+  metrics         Metric[]
+  activities      Activity[]
+  documents       Document[]
+
+  @@map("companies")
+}
+
+// Company founders
+model Founder {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  email       String?
+  linkedIn    String?
+  bio         String?
+  photo       String?
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("founders")
+}
+
+// Time-series metrics for portfolio companies
+model Metric {
+  id          String      @id @default(cuid())
+  date        DateTime
+  type        MetricType
+  value       Decimal     @db.Decimal(12, 2)
+  currency    String?     @default("USD")
+  notes       String?
+  createdAt   DateTime    @default(now())
+
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, date, type])
+  @@map("metrics")
+}
+
+// AI Agents configuration
+model Agent {
+  id              String      @id @default(cuid())
+  name            String
+  description     String?
+  type            AgentType
+  status          AgentStatus @default(INACTIVE)
+  config          Json?       // Agent-specific configuration
+  tools           String[]    // Available tools
+  lastRunAt       DateTime?
+  lastRunDuration Int?        // Seconds
+  totalRuns       Int         @default(0)
+  successRate     Decimal?    @db.Decimal(5, 2)
+  tokenUsage      Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  runs            AgentRun[]
+  schedules       AgentSchedule[]
+
+  @@map("agents")
+}
+
+// Agent execution logs
+model AgentRun {
+  id          String        @id @default(cuid())
+  status      RunStatus     @default(RUNNING)
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  duration    Int?          // Seconds
+  input       Json?
+  output      Json?
+  error       String?
+  tokenUsed   Int           @default(0)
+  cost        Decimal?      @db.Decimal(10, 4)
+  logs        String[]
+
+  agentId     String
+  agent       Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_runs")
+}
+
+// Scheduled agent tasks
+model AgentSchedule {
+  id          String            @id @default(cuid())
+  name        String
+  cron        String            // Cron expression
+  isActive    Boolean           @default(true)
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+  parameters  Json?
+  createdAt   DateTime          @default(now())
+
+  agentId     String
+  agent       Agent             @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_schedules")
+}
+
+// Activity feed for deals and companies
+model Activity {
+  id          String        @id @default(cuid())
+  type        ActivityType
+  title       String
+  description String?
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id])
+  dealId      String?
+  deal        Deal?         @relation(fields: [dealId], references: [id])
+  companyId   String?
+  company     Company?      @relation(fields: [companyId], references: [id])
+
+  @@index([createdAt])
+  @@map("activities")
+}
+
+// Documents and files
+model Document {
+  id          String        @id @default(cuid())
+  name        String
+  type        DocumentType
+  url         String
+  size        Int?          // Bytes
+  createdAt   DateTime      @default(now())
+
+  dealId      String?
+  deal        Deal?         @relation(fields: [dealId], references: [id])
+  companyId   String?
+  company     Company?      @relation(fields: [companyId], references: [id])
+
+  @@map("documents")
+}
+
+// Enums
+enum UserRole {
+  ADMIN       // Full access
+  PARTNER     // Investment team
+  ANALYST     // Investment team junior
+  FOUNDER     // Portfolio company founder
+  LP          // Limited Partner (investor)
+  VISITOR     // Public visitor
+}
+
+enum DealStatus {
+  SOURCED          // Initial contact
+  SCREENING        // Initial review
+  FIRST_MEETING    // First meeting held
+  PARTNER_MEETING  // Partner meeting scheduled/held
+  IC_PREP          // Preparing for IC
+  IC_PRESENTED     // Presented to IC
+  DILIGENCE        // Due diligence in progress
+  TERM_SHEET       // Term sheet issued
+  NEGOTIATING      // Negotiating terms
+  COMMITMENT       // Commitment made
+  CLOSED           // Deal closed/won
+  PASSED           // Passed on deal
+  STALE            // No activity > 90 days
+}
+
+enum DealStage {
+  PRE_SEED
+  SEED
+  SERIES_A
+  SERIES_B
+  SERIES_C
+  GROWTH
+  LATE_STAGE
+}
+
+enum CompanyStage {
+  SEED
+  SERIES_A
+  SERIES_B
+  SERIES_C
+  SERIES_D
+  GROWTH
+  PUBLIC
+  ACQUIRED
+}
+
+enum CompanyStatus {
+  ACTIVE
+  ACQUIRED
+  IPO
+  SHUTDOWN
+  ZOMBIE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MetricType {
+  ARR
+  MRR
+  GROWTH_RATE
+  BURN_RATE
+  CUSTOMER_COUNT
+  NRR
+  LTV
+  CAC
+  TEAM_SIZE
+  RUNWAY
+}
+
+enum AgentType {
+  RESEARCH        // Market/competitor research
+  SCREENING       // Deal screening
+  OUTREACH        // Founder outreach
+  DILIGENCE       // Due diligence support
+  PORTFOLIO       // Portfolio monitoring
+  REPORTING       // LP reporting
+  DATA_ENTRY      // CRM data entry
+  CUSTOM
+}
+
+enum AgentStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+  MAINTENANCE
+}
+
+enum RunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum ActivityType {
+  DEAL_CREATED
+  DEAL_UPDATED
+  DEAL_STAGE_CHANGED
+  DEAL_ASSIGNED
+  COMPANY_UPDATED
+  MEETING_SCHEDULED
+  MEETING_COMPLETED
+  NOTE_ADDED
+  DOCUMENT_UPLOADED
+  METRIC_UPDATED
+  AGENT_RUN
+  AGENT_SCHEDULED
+}
+
+enum DocumentType {
+  PITCH_DECK
+  FINANCIAL_MODEL
+  DATA_ROOM
+  TERM_SHEET
+  SAFE
+  NOTE
+  BOARD_DECK
+  REPORT
+  OTHER
+}

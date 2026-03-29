@@ -1,0 +1,422 @@
+{
+  "_comment": "=============================================================================",
+  "_comment1": "Kimi Code - Agent Behavior Settings",
+  "_comment2": "This file configures how the AI agent behaves during development tasks.",
+  "_comment3": "Documentation: https://docs.moonshot.ai/kimi-code/agent-settings",
+  "_comment4": "=============================================================================",
+
+  "version": "1.0.0",
+  "last_updated": "2025-01",
+
+  "agent": {
+    "_comment": "Core agent identity and behavior configuration",
+    
+    "identity": {
+      "name": "Kimi Code Assistant",
+      "role": "AI Software Development Assistant",
+      "version": "1.0.0",
+      "description": "An AI assistant specialized in software development, code review, and technical problem-solving"
+    },
+
+    "personality": {
+      "_comment": "Agent personality affects communication style",
+      "type": "professional",
+      "options": ["professional", "casual", "technical", "creative", "friendly"],
+      "description": {
+        "professional": "Formal, business-appropriate communication",
+        "casual": "Relaxed, conversational tone",
+        "technical": "Precise, jargon-heavy communication",
+        "creative": "Imaginative, exploratory approach",
+        "friendly": "Warm, supportive communication"
+      }
+    },
+
+    "communication": {
+      "_comment": "How the agent communicates with users",
+      "style": "balanced",
+      "style_options": ["concise", "balanced", "detailed", "verbose"],
+      "language": "en",
+      "supported_languages": ["en", "zh", "ja", "ko", "es", "fr", "de"],
+      "tone": "helpful",
+      "use_emojis": false,
+      "greeting_enabled": true,
+      "greeting_message": "Hello! I'm Kimi Code. How can I help you today?"
+    },
+
+    "response": {
+      "_comment": "Response formatting and length settings",
+      "max_length": 4096,
+      "max_length_tokens": 8192,
+      "format": "markdown",
+      "format_options": ["plain", "markdown", "html", "json"],
+      "include_code_examples": true,
+      "show_alternatives": true,
+      "confidence_threshold": 0.7,
+      "uncertainty_handling": "ask_for_clarification"
+    }
+  },
+
+  "coding": {
+    "_comment": "Code generation and editing preferences",
+
+    "style": {
+      "_comment": "Code style preferences",
+      "indentation": "spaces",
+      "indent_size": 2,
+      "line_length": 100,
+      "quote_style": "single",
+      "trailing_commas": true,
+      "semicolons": true
+    },
+
+    "comments": {
+      "_comment": "Comment generation preferences",
+      "style": "standard",
+      "style_options": ["minimal", "standard", "extensive", "docstring"],
+      "include_docstrings": true,
+      "include_inline": true,
+      "include_todos": true,
+      "language": "english"
+    },
+
+    "quality": {
+      "_comment": "Code quality settings",
+      "linting_enabled": true,
+      "formatting_enabled": true,
+      "type_checking": true,
+      "test_generation": true,
+      "security_scan": true,
+      "performance_hints": true
+    },
+
+    "patterns": {
+      "_comment": "Preferred design patterns and practices",
+      "prefer_functional": false,
+      "prefer_oop": true,
+      "prefer_async": true,
+      "error_handling": "try-catch",
+      "naming_convention": "camelCase",
+      "naming_conventions": {
+        "javascript": "camelCase",
+        "python": "snake_case",
+        "rust": "snake_case",
+        "go": "camelCase"
+      }
+    },
+
+    "generation": {
+      "_comment": "Code generation behavior",
+      "auto_import": true,
+      "auto_format": true,
+      "include_examples": true,
+      "include_tests": false,
+      "max_function_length": 50,
+      "max_file_length": 500,
+      "split_large_files": true
+    }
+  },
+
+  "tools": {
+    "_comment": "Tool usage behavior configuration",
+
+    "approval": {
+      "_comment": "Approval mode for tool execution",
+      "mode": "auto",
+      "mode_description": {
+        "manual": "Ask for approval before each tool use",
+        "auto": "Automatically approve safe operations",
+        "yolo": "Auto-approve all operations (use with caution!)"
+      },
+      "auto_approve_safe": true,
+      "confirm_destructive": true,
+      "show_tool_calls": true
+    },
+
+    "execution": {
+      "_comment": "Tool execution settings",
+      "timeout": 60,
+      "max_retries": 3,
+      "retry_delay": 1000,
+      "parallel_execution": true,
+      "max_concurrent": 5
+    },
+
+    "web_search": {
+      "_comment": "Web search tool settings",
+      "enabled": true,
+      "provider": "google",
+      "max_results": 10,
+      "safe_search": true,
+      "region": "us",
+      "auto_search": true,
+      "search_threshold": 0.5
+    },
+
+    "code_runner": {
+      "_comment": "Code execution tool settings",
+      "enabled": true,
+      "timeout": 60,
+      "max_memory": 512,
+      "network_access": false,
+      "allowed_languages": ["python", "javascript", "typescript", "bash", "rust", "go"],
+      "sandboxed": true
+    },
+
+    "rethink": {
+      "_comment": "Chain of thought / rethink tool settings",
+      "enabled": true,
+      "auto_trigger": true,
+      "confidence_threshold": 0.7,
+      "max_iterations": 3,
+      "show_process": false
+    },
+
+    "browser": {
+      "_comment": "Browser automation settings",
+      "enabled": true,
+      "headless": true,
+      "browser_type": "chromium",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "timeout": 30,
+      "javascript_enabled": true,
+      "screenshot_on_error": true
+    },
+
+    "file_operations": {
+      "_comment": "File read/write settings",
+      "enabled": true,
+      "allow_read": true,
+      "allow_write": true,
+      "allow_edit": true,
+      "allow_delete": false,
+      "max_file_size_mb": 10,
+      "backup_before_edit": true,
+      "show_diff": true
+    },
+
+    "shell": {
+      "_comment": "Shell execution settings",
+      "enabled": true,
+      "require_approval": true,
+      "timeout": 120,
+      "allowed_commands": ["ls", "cat", "grep", "find", "git", "npm", "pip", "python", "node"],
+      "blocked_commands": ["rm -rf /", "mkfs", "dd", "format", "del /f /s /q"],
+      "working_directory": "./"
+    },
+
+    "todo": {
+      "_comment": "Task management settings",
+      "enabled": true,
+      "auto_create": true,
+      "max_active": 20,
+      "remind_on_complete": true,
+      "show_progress": true
+    }
+  },
+
+  "context": {
+    "_comment": "Context and memory management",
+
+    "window": {
+      "_comment": "Context window settings",
+      "max_tokens": 256000,
+      "reserve_tokens": 8192,
+      "compression_enabled": true,
+      "compression_threshold": 0.8
+    },
+
+    "memory": {
+      "_comment": "Long-term memory settings",
+      "enabled": true,
+      "type": "conversation",
+      "persistence": "session",
+      "max_history": 100,
+      "summarize_threshold": 50
+    },
+
+    "files": {
+      "_comment": "File context settings",
+      "auto_include": true,
+      "max_files": 10,
+      "include_patterns": ["*.md", "README*", "package.json", "pyproject.toml"],
+      "exclude_patterns": ["node_modules/**", ".git/**", "*.log", "dist/**", "build/**"]
+    }
+  },
+
+  "planning": {
+    "_comment": "Task planning and execution strategy",
+
+    "strategy": {
+      "_comment": "How to approach complex tasks",
+      "mode": "adaptive",
+      "mode_options": ["sequential", "parallel", "adaptive", "aggressive"],
+      "break_down_tasks": true,
+      "estimate_effort": true,
+      "prioritize_steps": true
+    },
+
+    "execution": {
+      "_comment": "Execution behavior",
+      "confirm_plan": true,
+      "show_progress": true,
+      "allow_modifications": true,
+      "rollback_on_error": true,
+      "checkpoint_interval": 5
+    },
+
+    "error_handling": {
+      "_comment": "Error handling strategy",
+      "strategy": "retry",
+      "strategy_options": ["retry", "skip", "abort", "ask"],
+      "max_retries": 3,
+      "escalate_after": 2,
+      "log_errors": true
+    }
+  },
+
+  "multimodal": {
+    "_comment": "Multimodal input/output settings",
+
+    "images": {
+      "_comment": "Image handling",
+      "enabled": true,
+      "max_size_mb": 20,
+      "supported_formats": ["png", "jpg", "jpeg", "webp", "gif"],
+      "analyze_content": true,
+      "extract_text": true
+    },
+
+    "documents": {
+      "_comment": "Document handling",
+      "enabled": true,
+      "max_size_mb": 50,
+      "supported_formats": ["pdf", "docx", "txt", "md", "csv", "json"],
+      "extract_text": true,
+      "summarize_large": true
+    },
+
+    "audio": {
+      "_comment": "Audio handling",
+      "enabled": true,
+      "max_size_mb": 25,
+      "supported_formats": ["mp3", "wav", "ogg", "m4a"],
+      "transcribe": true,
+      "language": "auto"
+    }
+  },
+
+  "integrations": {
+    "_comment": "Third-party integration settings",
+
+    "git": {
+      "enabled": true,
+      "auto_commit": false,
+      "commit_message_style": "conventional",
+      "branch_prefix": "kimi/",
+      "show_diff": true
+    },
+
+    "github": {
+      "enabled": false,
+      "auto_pr": false,
+      "pr_template": "default",
+      "review_requests": true
+    },
+
+    "vscode": {
+      "enabled": true,
+      "auto_format": true,
+      "show_inline_hints": true,
+      "sync_settings": false
+    },
+
+    "docker": {
+      "enabled": false,
+      "auto_build": false,
+      "containerize_projects": false
+    }
+  },
+
+  "advanced": {
+    "_comment": "Advanced configuration options",
+
+    "reasoning": {
+      "_comment": "Reasoning and thinking settings",
+      "enabled": true,
+      "show_thinking": false,
+      "depth": "medium",
+      "depth_options": ["shallow", "medium", "deep"]
+    },
+
+    "creativity": {
+      "_comment": "Creativity settings",
+      "level": 0.3,
+      "range": "0.0 (deterministic) to 1.0 (creative)",
+      "brainstorming": true
+    },
+
+    "optimization": {
+      "_comment": "Performance optimization",
+      "cache_enabled": true,
+      "batch_requests": true,
+      "compress_context": true,
+      "lazy_loading": true
+    },
+
+    "debugging": {
+      "_comment": "Debug and development settings",
+      "verbose_logging": false,
+      "show_api_calls": false,
+      "save_conversations": false,
+      "profile_performance": false
+    }
+  },
+
+  "presets": {
+    "_comment": "Predefined configuration presets for different use cases",
+
+    "coding": {
+      "description": "Optimized for code generation and editing",
+      "personality": "technical",
+      "response_style": "detailed",
+      "comment_style": "standard",
+      "temperature": 0.2
+    },
+
+    "learning": {
+      "description": "Optimized for teaching and explanation",
+      "personality": "friendly",
+      "response_style": "detailed",
+      "comment_style": "extensive",
+      "temperature": 0.5
+    },
+
+    "review": {
+      "description": "Optimized for code review",
+      "personality": "professional",
+      "response_style": "concise",
+      "comment_style": "minimal",
+      "temperature": 0.1
+    },
+
+    "creative": {
+      "description": "Optimized for creative problem solving",
+      "personality": "creative",
+      "response_style": "balanced",
+      "comment_style": "minimal",
+      "temperature": 0.8
+    },
+
+    "fast": {
+      "description": "Optimized for quick responses",
+      "personality": "professional",
+      "response_style": "concise",
+      "comment_style": "minimal",
+      "temperature": 0.3,
+      "max_tokens": 2048
+    }
+  }
+}

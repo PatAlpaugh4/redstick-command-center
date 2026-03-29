@@ -1,0 +1,532 @@
+{
+  "_comment": "=============================================================================",
+  "_comment1": "Kimi Code - MCP (Model Context Protocol) Server Configuration",
+  "_comment2": "This file defines MCP servers for extending Kimi Code capabilities.",
+  "_comment3": "MCP Documentation: https://modelcontextprotocol.io/",
+  "_comment4": "=============================================================================",
+
+  "version": "1.0.0",
+  "last_updated": "2025-01",
+
+  "mcp": {
+    "_comment": "Global MCP settings",
+    "enabled": true,
+    "auto_connect": true,
+    "connection_timeout": 30,
+    "request_timeout": 60,
+    "max_retries": 3,
+    "retry_delay_ms": 1000,
+    "log_level": "info"
+  },
+
+  "servers": {
+    "_comment": "MCP server definitions",
+
+    "filesystem": {
+      "_comment": "Local filesystem access via MCP",
+      "name": "filesystem",
+      "display_name": "Filesystem Access",
+      "description": "Read and write files on the local filesystem",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/user/projects",
+        "/home/user/documents"
+      ],
+      "env": {},
+      "capabilities": {
+        "read": true,
+        "write": true,
+        "delete": false,
+        "search": true
+      },
+      "permissions": {
+        "allowed_paths": ["/home/user/projects", "/home/user/documents"],
+        "blocked_paths": ["/etc", "/usr", "/root", "/home/user/.ssh"],
+        "max_file_size_mb": 10
+      }
+    },
+
+    "github": {
+      "_comment": "GitHub integration via MCP",
+      "name": "github",
+      "display_name": "GitHub",
+      "description": "Access GitHub repositories, issues, pull requests, and more",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "capabilities": {
+        "repositories": true,
+        "issues": true,
+        "pull_requests": true,
+        "actions": true,
+        "code_search": true
+      },
+      "permissions": {
+        "read_only": false,
+        "allowed_repos": ["*"],
+        "max_results": 100
+      }
+    },
+
+    "gitlab": {
+      "_comment": "GitLab integration via MCP",
+      "name": "gitlab",
+      "display_name": "GitLab",
+      "description": "Access GitLab repositories, issues, merge requests",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "env": {
+        "GITLAB_TOKEN": "${GITLAB_TOKEN}",
+        "GITLAB_URL": "${GITLAB_URL}"
+      },
+      "capabilities": {
+        "repositories": true,
+        "issues": true,
+        "merge_requests": true,
+        "pipelines": true
+      }
+    },
+
+    "postgres": {
+      "_comment": "PostgreSQL database access via MCP",
+      "name": "postgres",
+      "display_name": "PostgreSQL",
+      "description": "Query and manage PostgreSQL databases",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${POSTGRES_URL}"],
+      "env": {},
+      "capabilities": {
+        "query": true,
+        "schema_read": true,
+        "write": false
+      },
+      "permissions": {
+        "read_only": true,
+        "allowed_tables": ["*"],
+        "blocked_tables": ["users_passwords", "api_keys"],
+        "max_rows": 1000
+      }
+    },
+
+    "sqlite": {
+      "_comment": "SQLite database access via MCP",
+      "name": "sqlite",
+      "display_name": "SQLite",
+      "description": "Query and manage SQLite databases",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "./data/kimi_code.db"],
+      "env": {},
+      "capabilities": {
+        "query": true,
+        "schema_read": true,
+        "write": true
+      },
+      "permissions": {
+        "read_only": false,
+        "max_rows": 10000
+      }
+    },
+
+    "fetch": {
+      "_comment": "HTTP fetch capabilities via MCP",
+      "name": "fetch",
+      "display_name": "HTTP Fetch",
+      "description": "Make HTTP requests to external APIs and websites",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "env": {},
+      "capabilities": {
+        "get": true,
+        "post": true,
+        "put": true,
+        "delete": false,
+        "headers": true
+      },
+      "permissions": {
+        "allowed_domains": ["*"],
+        "blocked_domains": ["localhost", "127.0.0.1", "10.*", "192.168.*"],
+        "max_response_size_mb": 5,
+        "timeout_seconds": 30
+      }
+    },
+
+    "puppeteer": {
+      "_comment": "Browser automation via Puppeteer MCP",
+      "name": "puppeteer",
+      "display_name": "Puppeteer Browser",
+      "description": "Control a headless browser for web scraping and automation",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "env": {},
+      "capabilities": {
+        "navigate": true,
+        "click": true,
+        "type": true,
+        "screenshot": true,
+        "evaluate": true
+      },
+      "permissions": {
+        "allowed_urls": ["*"],
+        "blocked_urls": ["file://*", "chrome://*"],
+        "allow_downloads": false,
+        "max_navigation_time": 30
+      }
+    },
+
+    "aws": {
+      "_comment": "AWS integration via MCP",
+      "name": "aws",
+      "display_name": "AWS Services",
+      "description": "Access AWS services like S3, EC2, Lambda",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-aws"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${AWS_SECRET_ACCESS_KEY}",
+        "AWS_REGION": "${AWS_REGION}"
+      },
+      "capabilities": {
+        "s3": true,
+        "ec2": false,
+        "lambda": false,
+        "cloudwatch": true
+      },
+      "permissions": {
+        "read_only": true,
+        "allowed_buckets": ["*"],
+        "max_objects": 100
+      }
+    },
+
+    "gcp": {
+      "_comment": "Google Cloud Platform via MCP",
+      "name": "gcp",
+      "display_name": "Google Cloud",
+      "description": "Access Google Cloud services",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gcp"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_CLOUD_KEY_FILE}",
+        "GOOGLE_CLOUD_PROJECT": "${GOOGLE_CLOUD_PROJECT}"
+      },
+      "capabilities": {
+        "storage": true,
+        "bigquery": false,
+        "cloudfunctions": false
+      }
+    },
+
+    "sentry": {
+      "_comment": "Sentry error tracking via MCP",
+      "name": "sentry",
+      "display_name": "Sentry",
+      "description": "Access Sentry issues and error reports",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sentry"],
+      "env": {
+        "SENTRY_TOKEN": "${SENTRY_TOKEN}",
+        "SENTRY_ORG": "your-org"
+      },
+      "capabilities": {
+        "issues": true,
+        "projects": true,
+        "releases": true
+      }
+    },
+
+    "slack": {
+      "_comment": "Slack integration via MCP",
+      "name": "slack",
+      "display_name": "Slack",
+      "description": "Send messages and interact with Slack workspaces",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
+        "SLACK_TEAM_ID": "${SLACK_TEAM_ID}"
+      },
+      "capabilities": {
+        "read_messages": true,
+        "send_messages": true,
+        "channels": true,
+        "users": false
+      },
+      "permissions": {
+        "allowed_channels": ["#general", "#dev", "#alerts"],
+        "read_only": false
+      }
+    },
+
+    "notion": {
+      "_comment": "Notion integration via MCP",
+      "name": "notion",
+      "display_name": "Notion",
+      "description": "Read and write Notion pages and databases",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-notion"],
+      "env": {
+        "NOTION_TOKEN": "${NOTION_TOKEN}"
+      },
+      "capabilities": {
+        "pages": true,
+        "databases": true,
+        "blocks": true
+      },
+      "permissions": {
+        "read_only": false,
+        "allowed_pages": ["*"]
+      }
+    },
+
+    "jira": {
+      "_comment": "Jira integration via MCP",
+      "name": "jira",
+      "display_name": "Jira",
+      "description": "Access Jira issues, projects, and sprints",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-jira"],
+      "env": {
+        "JIRA_URL": "${JIRA_URL}",
+        "JIRA_EMAIL": "${JIRA_EMAIL}",
+        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}"
+      },
+      "capabilities": {
+        "issues": true,
+        "projects": true,
+        "sprints": true,
+        "comments": true
+      }
+    },
+
+    "linear": {
+      "_comment": "Linear integration via MCP",
+      "name": "linear",
+      "display_name": "Linear",
+      "description": "Access Linear issues and projects",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-linear"],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      },
+      "capabilities": {
+        "issues": true,
+        "projects": true,
+        "teams": true
+      }
+    },
+
+    "redis": {
+      "_comment": "Redis cache access via MCP",
+      "name": "redis",
+      "display_name": "Redis",
+      "description": "Access Redis cache and data store",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis", "${REDIS_URL}"],
+      "env": {},
+      "capabilities": {
+        "get": true,
+        "set": false,
+        "delete": false,
+        "list_keys": true
+      },
+      "permissions": {
+        "read_only": true,
+        "max_keys": 1000
+      }
+    },
+
+    "brave-search": {
+      "_comment": "Brave Search API via MCP",
+      "name": "brave-search",
+      "display_name": "Brave Search",
+      "description": "Search the web using Brave Search API",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
+      "capabilities": {
+        "web_search": true,
+        "news_search": true,
+        "image_search": false
+      },
+      "permissions": {
+        "max_results": 20,
+        "safe_search": true
+      }
+    },
+
+    "memory": {
+      "_comment": "Persistent memory via MCP",
+      "name": "memory",
+      "display_name": "Persistent Memory",
+      "description": "Store and retrieve information across sessions",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "./data/memory.json"
+      },
+      "capabilities": {
+        "store": true,
+        "retrieve": true,
+        "search": true,
+        "delete": true
+      },
+      "permissions": {
+        "max_entries": 10000,
+        "max_entry_size_kb": 100
+      }
+    },
+
+    "sequential-thinking": {
+      "_comment": "Sequential thinking tool via MCP",
+      "name": "sequential-thinking",
+      "display_name": "Sequential Thinking",
+      "description": "Break down complex problems into sequential steps",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {},
+      "capabilities": {
+        "think": true,
+        "revise": true,
+        "branch": true
+      },
+      "config": {
+        "max_steps": 10,
+        "show_process": true
+      }
+    },
+
+    "time": {
+      "_comment": "Time and timezone utilities via MCP",
+      "name": "time",
+      "display_name": "Time Utilities",
+      "description": "Get current time and convert timezones",
+      "enabled": true,
+      "transport": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-time", "--local-timezone=America/New_York"],
+      "env": {},
+      "capabilities": {
+        "current_time": true,
+        "timezone_conversion": true,
+        "formatting": true
+      }
+    },
+
+    "everything": {
+      "_comment": "Everything search (Windows) via MCP",
+      "name": "everything",
+      "display_name": "Everything Search",
+      "description": "Fast file search using Everything (Windows only)",
+      "enabled": false,
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"],
+      "env": {},
+      "capabilities": {
+        "search": true,
+        "file_info": true
+      },
+      "permissions": {
+        "max_results": 1000
+      }
+    }
+  },
+
+  "custom_servers": {
+    "_comment": "Custom MCP server definitions",
+
+    "local-api": {
+      "name": "local-api",
+      "display_name": "Local API Server",
+      "description": "Custom local API integration",
+      "enabled": false,
+      "transport": "sse",
+      "url": "http://localhost:3001/sse",
+      "env": {
+        "API_KEY": "${LOCAL_API_KEY}"
+      },
+      "capabilities": {
+        "custom_endpoints": true
+      }
+    },
+
+    "websocket-server": {
+      "name": "websocket-server",
+      "display_name": "WebSocket Server",
+      "description": "Real-time WebSocket integration",
+      "enabled": false,
+      "transport": "websocket",
+      "url": "ws://localhost:3002/mcp",
+      "env": {},
+      "capabilities": {
+        "realtime": true
+      }
+    }
+  },
+
+  "groups": {
+    "_comment": "Server groups for easy management",
+
+    "development": {
+      "description": "Servers for development workflow",
+      "servers": ["filesystem", "github", "sqlite", "memory"]
+    },
+
+    "production": {
+      "description": "Servers for production environment",
+      "servers": ["github", "postgres", "redis", "sentry", "slack"]
+    },
+
+    "cloud": {
+      "description": "Cloud provider integrations",
+      "servers": ["aws", "gcp"]
+    },
+
+    "productivity": {
+      "description": "Productivity tool integrations",
+      "servers": ["slack", "notion", "jira", "linear"]
+    }
+  }
+}

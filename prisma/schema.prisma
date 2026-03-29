@@ -1,0 +1,291 @@
+// This is your Prisma schema file for Redstick Ventures Command Center
+// Learn more about Prisma: https://pris.ly/d/prisma-schema
+
+// Generator for Prisma Client
+// The client is auto-generated and provides type-safe database access
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Database connection configuration
+// Uses PostgreSQL with connection pooling for production environments
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MODEL
+// ============================================
+// Stores user accounts and authentication information
+// Used for access control and audit trails
+model User {
+  /// Unique identifier (CUID)
+  id        String   @id @default(cuid())
+  /// User email address (unique)
+  email     String   @unique
+  /// User's full name
+  name      String
+  /// User role for permissions (ADMIN, PARTNER, ANALYST)
+  role      UserRole @default(ANALYST)
+  /// Hashed password (never store plain text)
+  password  String
+  /// Optional profile image URL
+  image     String?
+  /// Account creation timestamp
+  createdAt DateTime @default(now())
+  /// Last update timestamp
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  /// Deals assigned to this user
+  assignedDeals Deal[]     @relation("AssignedDeals")
+  /// Agent runs triggered by this user
+  agentRuns     AgentRun[] @relation("UserAgentRuns")
+
+  // Indexes
+  @@index([role])
+}
+
+// ============================================
+// DEAL MODEL
+// ============================================
+// Stores investment opportunities and pipeline data
+// Core entity for deal flow management
+model Deal {
+  /// Unique identifier (CUID)
+  id          String     @id @default(cuid())
+  /// Company name (display name)
+  companyName String
+  /// Pipeline stage (INBOUND to CLOSED)
+  stage       DealStage  @default(INBOUND)
+  /// Investment amount in USD
+  amount      Float?
+  /// Detailed deal description
+  description String?
+  /// Lead source (REFERRAL, COLD_OUTREACH, etc.)
+  source      DealSource @default(REFERRAL)
+  /// Deal status (ACTIVE, INACTIVE, ARCHIVED)
+  status      DealStatus @default(ACTIVE)
+  /// Linked company ID (optional)
+  companyId   String?
+  /// Assigned user ID (optional)
+  assignedTo  String?
+  /// Creation timestamp
+  createdAt   DateTime   @default(now())
+  /// Last update timestamp
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  /// Linked company (if exists in portfolio)
+  company    Company? @relation(fields: [companyId], references: [id])
+  /// Assigned user
+  assignee   User?    @relation("AssignedDeals", fields: [assignedTo], references: [id])
+
+  // Indexes for common query patterns
+  @@index([stage])      // Pipeline filtering
+  @@index([status])     // List views
+  @@index([assignedTo]) // "My deals" view
+  @@index([companyId])  // Company lookup
+  @@index([companyName]) // Search by company name
+}
+
+// ============================================
+// COMPANY MODEL
+// ============================================
+// Stores portfolio company information
+// Tracks investments and company metrics
+model Company {
+  /// Unique identifier (CUID)
+  id          String          @id @default(cuid())
+  /// Company name (unique)
+  name        String          @unique
+  /// Industry sector (AI, Fintech, Healthcare, etc.)
+  sector      String
+  /// Funding stage (Pre-seed, Seed, Series A, etc.)
+  stage       String
+  /// Company website URL
+  website     String?
+  /// Company description
+  description String?
+  /// Year founded
+  founded     Int?
+  /// Number of employees
+  employees   Int?
+  /// Total investment amount
+  investment  Float?
+  /// Current valuation
+  valuation   Float?
+  /// Company status (ACTIVE, ACQUIRED, IPO, SHUTDOWN)
+  status      CompanyStatus   @default(ACTIVE)
+  /// Creation timestamp
+  createdAt   DateTime        @default(now())
+  /// Last update timestamp
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  /// Deals associated with this company
+  deals Deal[]
+
+  // Indexes
+  @@index([name])
+  @@index([sector])
+  @@index([status])
+}
+
+// ============================================
+// AGENT MODEL
+// ============================================
+// Stores AI agent configurations and metadata
+// Tracks agent performance and usage
+model Agent {
+  /// Unique identifier (CUID)
+  id          String       @id @default(cuid())
+  /// Agent name
+  name        String
+  /// Agent description
+  description String
+  /// Agent type (SCREENING, RESEARCH, PORTFOLIO, etc.)
+  type        AgentType
+  /// Agent status (ACTIVE, INACTIVE, ERROR, MAINTENANCE)
+  status      AgentStatus  @default(INACTIVE)
+  /// Agent configuration (JSON for flexibility)
+  config      Json         @default("{}")
+  /// Last execution timestamp
+  lastRun     DateTime?
+  /// Success rate percentage (0-100)
+  successRate Int          @default(0)
+  /// Total number of executions
+  totalRuns   Int          @default(0)
+  /// Total API token usage
+  tokenUsage  Int          @default(0)
+  /// Creation timestamp
+  createdAt   DateTime     @default(now())
+  /// Last update timestamp
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  /// Execution history for this agent
+  runs AgentRun[]
+
+  // Indexes
+  @@index([type])
+  @@index([status])
+  @@index([name])
+}
+
+// ============================================
+// AGENT RUN MODEL
+// ============================================
+// Stores agent execution history and logs
+// Used for debugging and audit trails
+model AgentRun {
+  /// Unique identifier (CUID)
+  id          String    @id @default(cuid())
+  /// Parent agent ID
+  agentId     String
+  /// User who triggered the run (optional)
+  userId      String?
+  /// Run status (RUNNING, COMPLETED, FAILED)
+  status      RunStatus @default(RUNNING)
+  /// Execution start timestamp
+  startedAt   DateTime  @default(now())
+  /// Execution completion timestamp
+  completedAt DateTime?
+  /// Execution duration in milliseconds
+  duration    Int?
+  /// Tokens consumed during execution
+  tokensUsed  Int       @default(0)
+  /// Run output/result
+  output      String?
+  /// Error message (if failed)
+  error       String?
+
+  // Relations
+  /// Parent agent
+  agent Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  /// Triggering user
+  user  User?  @relation("UserAgentRuns", fields: [userId], references: [id])
+
+  // Indexes for querying run history
+  @@index([agentId])
+  @@index([userId])
+  @@index([startedAt])
+  @@index([status])
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+/// User roles for access control
+enum UserRole {
+  ADMIN    // Full system access
+  PARTNER  // Investment decision access
+  ANALYST  // Research and analysis access
+}
+
+/// Deal pipeline stages
+enum DealStage {
+  INBOUND        // Initial interest received
+  SCREENING      // Initial qualification
+  FIRST_MEETING  // First founder meeting
+  DEEP_DIVE      // Detailed analysis
+  DUE_DILIGENCE  // Formal due diligence
+  IC_REVIEW      // Investment committee review
+  TERM_SHEET     // Term sheet issued
+  CLOSED         // Investment completed
+  PASSED         // Declined opportunity
+}
+
+/// Deal status for filtering
+enum DealStatus {
+  ACTIVE    // Currently in pipeline
+  INACTIVE  // On hold
+  ARCHIVED  // Closed/completed
+}
+
+/// Lead source for attribution
+enum DealSource {
+  REFERRAL       // Personal/professional referral
+  COLD_OUTREACH  // Cold email/call
+  EVENT          // Conference or event
+  ONLINE         // Website/form submission
+  PORTAL         // Investment portal
+  OTHER          // Other sources
+}
+
+/// Portfolio company status
+enum CompanyStatus {
+  ACTIVE    // Currently in portfolio
+  ACQUIRED  // Acquired by another company
+  IPO       // Went public
+  SHUTDOWN  // Company shut down
+}
+
+/// AI agent types
+enum AgentType {
+  SCREENING   // Deal screening agent
+  RESEARCH    // Market/company research
+  PORTFOLIO   // Portfolio monitoring
+  OUTREACH    // Outreach automation
+  DILIGENCE   // Due diligence assistant
+  REPORTING   // Report generation
+}
+
+/// Agent operational status
+enum AgentStatus {
+  ACTIVE      // Ready to execute
+  INACTIVE    // Disabled
+  ERROR       // Error state
+  MAINTENANCE // Under maintenance
+  RUNNING     // Currently executing
+}
+
+/// Agent run execution status
+enum RunStatus {
+  RUNNING    // Currently executing
+  COMPLETED  // Successfully finished
+  FAILED     // Execution failed
+  CANCELLED  // Manually cancelled
+}

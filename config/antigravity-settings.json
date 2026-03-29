@@ -1,0 +1,671 @@
+{
+  "_comment": "=============================================================================",
+  "_comment1": "Antigravity IDE - Configuration Settings",
+  "_comment2": "IDE-specific settings for Antigravity development environment.",
+  "_comment3": "Documentation: https://docs.antigravity.dev/settings",
+  "_comment4": "=============================================================================",
+
+  "version": "1.0.0",
+  "last_updated": "2025-01",
+  "schema_version": "2.0",
+
+  "ide": {
+    "_comment": "Core IDE settings",
+    
+    "identity": {
+      "name": "Antigravity IDE",
+      "version": "1.0.0",
+      "edition": "professional",
+      "license_key": "${ANTIGRAVITY_LICENSE_KEY}"
+    },
+
+    "window": {
+      "_comment": "Window and UI settings",
+      "width": 1400,
+      "height": 900,
+      "min_width": 800,
+      "min_height": 600,
+      "center_on_startup": true,
+      "maximized": false,
+      "fullscreen": false,
+      "remember_position": true,
+      "remember_size": true
+    },
+
+    "theme": {
+      "_comment": "Appearance and theming",
+      "mode": "dark",
+      "available_modes": ["light", "dark", "system", "high-contrast"],
+      "color_scheme": "antigravity-dark",
+      "available_schemes": [
+        "antigravity-dark",
+        "antigravity-light",
+        "dracula",
+        "monokai",
+        "github",
+        "solarized"
+      ],
+      "font_family": "JetBrains Mono",
+      "font_size": 14,
+      "line_height": 1.5,
+      "ui_scale": 1.0
+    },
+
+    "startup": {
+      "_comment": "Startup behavior",
+      "restore_session": true,
+      "show_welcome_page": true,
+      "open_last_project": true,
+      "check_updates": true,
+      "load_extensions": true
+    }
+  },
+
+  "editor": {
+    "_comment": "Code editor settings",
+
+    "general": {
+      "tab_size": 2,
+      "use_spaces": true,
+      "word_wrap": true,
+      "wrap_column": 100,
+      "show_line_numbers": true,
+      "show_whitespace": false,
+      "show_indent_guides": true,
+      "highlight_current_line": true,
+      "highlight_matching_brackets": true,
+      "auto_save": true,
+      "auto_save_delay": 1000,
+      "format_on_save": true,
+      "trim_trailing_whitespace": true,
+      "insert_final_newline": true
+    },
+
+    "intellisense": {
+      "_comment": "Code intelligence settings",
+      "enabled": true,
+      "auto_complete": true,
+      "suggest_on_trigger": true,
+      "suggest_on_type": true,
+      "quick_suggestions": true,
+      "parameter_hints": true,
+      "hover_info": true,
+      "signature_help": true,
+      "code_lens": true,
+      "inlay_hints": true,
+      "suggest_imports": true,
+      "auto_import": true
+    },
+
+    "diagnostics": {
+      "_comment": "Error and warning settings",
+      "enabled": true,
+      "show_errors": true,
+      "show_warnings": true,
+      "show_info": true,
+      "show_hints": true,
+      "underline_errors": true,
+      "show_in_gutter": true,
+      "show_in_overview": true,
+      "auto_fix_on_save": false
+    },
+
+    "search": {
+      "_comment": "Search and replace settings",
+      "case_sensitive": false,
+      "whole_word": false,
+      "regex": false,
+      "preserve_case": false,
+      "search_in_selection": false,
+      "search_on_type": true,
+      "search_delay": 300
+    },
+
+    "minimap": {
+      "_comment": "Minimap settings",
+      "enabled": true,
+      "show_slider": true,
+      "render_characters": true,
+      "max_column": 120,
+      "scale": 1
+    },
+
+    "breadcrumbs": {
+      "_comment": "Breadcrumb navigation",
+      "enabled": true,
+      "show_symbols": true,
+      "show_files": true,
+      "symbol_sort_order": "position"
+    },
+
+    "folding": {
+      "_comment": "Code folding settings",
+      "enabled": true,
+      "fold_imports": false,
+      "fold_comments": false,
+      "fold_regions": true,
+      "fold_markers": true
+    },
+
+    "diff": {
+      "_comment": "Diff viewer settings",
+      "side_by_side": true,
+      "ignore_whitespace": false,
+      "show_unchanged": true,
+      "context_lines": 3
+    }
+  },
+
+  "kimi_code": {
+    "_comment": "Kimi Code integration settings",
+
+    "general": {
+      "enabled": true,
+      "auto_start": true,
+      "default_provider": "kimi",
+      "default_model": "kimi-k2.5",
+      "context_window": 256000
+    },
+
+    "chat": {
+      "_comment": "Chat interface settings",
+      "show_avatar": true,
+      "show_timestamps": true,
+      "show_token_count": true,
+      "markdown_rendering": true,
+      "code_highlighting": true,
+      "copy_button": true,
+      "max_history": 100,
+      "clear_on_new_session": false
+    },
+
+    "inline": {
+      "_comment": "Inline completion settings",
+      "enabled": true,
+      "trigger_on_typing": true,
+      "debounce_delay": 150,
+      "max_suggestions": 3,
+      "show_accept_keybinding": true,
+      "accept_keybinding": "Tab",
+      "dismiss_keybinding": "Escape"
+    },
+
+    "agents": {
+      "_comment": "AI agent settings",
+      "enabled": true,
+      "default_agent": "code-assistant",
+      "available_agents": [
+        "code-assistant",
+        "code-reviewer",
+        "debugger",
+        "architect",
+        "documenter",
+        "tester"
+      ],
+      "auto_detect_language": true,
+      "show_agent_thinking": false
+    },
+
+    "tools": {
+      "_comment": "Tool integration settings",
+      "enabled": true,
+      "approval_mode": "auto",
+      "approval_modes": {
+        "manual": "Ask before each tool use",
+        "auto": "Auto-approve safe operations",
+        "yolo": "Auto-approve all (use with caution)"
+      },
+      "enabled_tools": [
+        "web_search",
+        "code_runner",
+        "rethink",
+        "browser_visit",
+        "browser_click",
+        "file_read",
+        "file_write",
+        "file_edit",
+        "shell_execute",
+        "todo_manager"
+      ],
+      "show_tool_output": true,
+      "max_tool_output_lines": 100
+    },
+
+    "context": {
+      "_comment": "Context management settings",
+      "include_open_files": true,
+      "include_project_structure": true,
+      "include_recent_changes": true,
+      "max_files_in_context": 10,
+      "max_lines_per_file": 100,
+      "auto_summarize": true
+    },
+
+    "commands": {
+      "_comment": "Slash commands configuration",
+      "enabled": true,
+      "commands": [
+        {
+          "name": "/explain",
+          "description": "Explain selected code",
+          "shortcut": "Ctrl+Shift+E"
+        },
+        {
+          "name": "/refactor",
+          "description": "Refactor selected code",
+          "shortcut": "Ctrl+Shift+R"
+        },
+        {
+          "name": "/test",
+          "description": "Generate tests for selected code",
+          "shortcut": "Ctrl+Shift+T"
+        },
+        {
+          "name": "/doc",
+          "description": "Generate documentation",
+          "shortcut": "Ctrl+Shift+D"
+        },
+        {
+          "name": "/fix",
+          "description": "Fix errors in selected code",
+          "shortcut": "Ctrl+Shift+F"
+        },
+        {
+          "name": "/review",
+          "description": "Review code for issues",
+          "shortcut": "Ctrl+Shift+V"
+        },
+        {
+          "name": "/commit",
+          "description": "Generate commit message",
+          "shortcut": "Ctrl+Shift+C"
+        },
+        {
+          "name": "/search",
+          "description": "Search the web",
+          "shortcut": null
+        },
+        {
+          "name": "/run",
+          "description": "Run code and show output",
+          "shortcut": null
+        }
+      ]
+    },
+
+    "appearance": {
+      "_comment": "Visual appearance in IDE",
+      "panel_position": "right",
+      "panel_width": 400,
+      "min_panel_width": 300,
+      "chat_bubble_style": "modern",
+      "user_color": "#4A90D9",
+      "assistant_color": "#10A37F",
+      "code_block_theme": "dark-plus"
+    }
+  },
+
+  "workbench": {
+    "_comment": "Workbench and UI layout settings",
+
+    "layout": {
+      "_comment": "Panel and sidebar layout",
+      "sidebar_position": "left",
+      "sidebar_width": 250,
+      "panel_position": "bottom",
+      "panel_height": 300,
+      "activity_bar": true,
+      "status_bar": true,
+      "tab_bar": true,
+      "breadcrumbs": true
+    },
+
+    "sidebar": {
+      "_comment": "Sidebar settings",
+      "default_view": "explorer",
+      "visible_views": [
+        "explorer",
+        "search",
+        "source_control",
+        "debug",
+        "extensions",
+        "kimi_code"
+      ],
+      "auto_reveal": true
+    },
+
+    "panel": {
+      "_comment": "Bottom panel settings",
+      "default_tab": "terminal",
+      "tabs": [
+        "terminal",
+        "output",
+        "problems",
+        "debug_console",
+        "kimi_chat"
+      ],
+      "restore_on_startup": true
+    },
+
+    "status_bar": {
+      "_comment": "Status bar settings",
+      "visible": true,
+      "items": [
+        "branch",
+        "sync",
+        "errors",
+        "warnings",
+        "position",
+        "encoding",
+        "eol",
+        "language",
+        "indentation",
+        "kimi_status"
+      ]
+    },
+
+    "notifications": {
+      "_comment": "Notification settings",
+      "enabled": true,
+      "show_toast": true,
+      "toast_duration": 5000,
+      "position": "bottom-right",
+      "max_visible": 3,
+      "group_similar": true
+    }
+  },
+
+  "files": {
+    "_comment": "File handling settings",
+
+    "explorer": {
+      "_comment": "File explorer settings",
+      "auto_reveal": true,
+      "sort_order": "default",
+      "sort_orders": ["default", "mixed", "filesFirst", "type", "modified", "filesNested"],
+      "confirm_drag_and_drop": true,
+      "confirm_delete": true,
+      "confirm_undo": true,
+      "open_mode": "singleClick",
+      "compress_single_child_folder": true
+    },
+
+    "watcher": {
+      "_comment": "File watcher settings",
+      "enabled": true,
+      "exclude": [
+        "**/.git/objects/**",
+        "**/.git/subtree-cache/**",
+        "**/node_modules/*/**",
+        "**/.hg/store/**",
+        "**/dist/**",
+        "**/build/**"
+      ],
+      "use_polling": false,
+      "polling_interval": 1000
+    },
+
+    "associations": {
+      "_comment": "File type associations",
+      "*.toml": "toml",
+      "*.conf": "properties",
+      "*.env": "dotenv",
+      "Dockerfile*": "dockerfile",
+      "*.tsx": "typescriptreact",
+      "*.jsx": "javascriptreact"
+    },
+
+    "encoding": {
+      "_comment": "File encoding settings",
+      "default": "utf8",
+      "auto_guess_encoding": true,
+      "fallback_encoding": "utf8"
+    },
+
+    "eol": {
+      "_comment": "End of line settings",
+      "default": "auto",
+      "trim_trailing_whitespace": true,
+      "insert_final_newline": true
+    }
+  },
+
+  "terminal": {
+    "_comment": "Integrated terminal settings",
+
+    "general": {
+      "shell": "default",
+      "shell_args": [],
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "strict_env": true,
+      "enable_persistent_sessions": true
+    },
+
+    "appearance": {
+      "font_family": "JetBrains Mono",
+      "font_size": 14,
+      "line_height": 1.2,
+      "cursor_style": "block",
+      "cursor_blink": true
+    },
+
+    "behavior": {
+      "copy_on_selection": false,
+      "right_click_behavior": "contextMenu",
+      "scrollback": 10000,
+      "fast_scroll_sensitivity": 5,
+      "alt_click_moves_cursor": true
+    },
+
+    "features": {
+      "confirm_on_exit": true,
+      "confirm_on_kill": true,
+      "show_exit_alert": true,
+      "close_on_exit": true,
+      "allow_chord_tty_write": true
+    }
+  },
+
+  "git": {
+    "_comment": "Git integration settings",
+
+    "general": {
+      "enabled": true,
+      "path": "git",
+      "autorefresh": true,
+      "autofetch": false,
+      "confirm_sync": true,
+      "confirm_force_push": true,
+      "confirm_empty_commit": true
+    },
+
+    "decorations": {
+      "enabled": true,
+      "colors": true,
+      "badges": true
+    },
+
+    "commit": {
+      "confirm_empty": true,
+      "verbose": true,
+      "signoff": false,
+      "template": ""
+    },
+
+    "branches": {
+      "sort_order": "alphabetically",
+      "protected": ["main", "master", "develop"],
+      "confirm_delete": true,
+      "confirm_force_delete": true
+    },
+
+    "merge": {
+      "auto_stash": true,
+      "conflict_auto_resolve": false
+    },
+
+    "ignored": {
+      "show_in_explorer": false,
+      "hide_in_search": true
+    }
+  },
+
+  "debug": {
+    "_comment": "Debugging settings",
+
+    "general": {
+      "allow_break_everywhere": false,
+      "open_debug": "openOnDebugBreak",
+      "open_explorer_on_end": false,
+      "inline_values": true,
+      "show_in_status_bar": true
+    },
+
+    "console": {
+      "collapse_identical_lines": true,
+      "font_size": 14,
+      "word_wrap": true
+    },
+
+    "features": {
+      "auto_attach": "smart",
+      "auto_attach_smart_pattern": "${workspaceFolder}/node_modules/.bin/*",
+      "auto_attach_child_processes": true
+    }
+  },
+
+  "extensions": {
+    "_comment": "Extension management settings",
+
+    "general": {
+      "auto_update": true,
+      "auto_check_updates": true,
+      "show_recommendations": true,
+      "ignore_recommendations": []
+    },
+
+    "marketplace": {
+      "enabled": true,
+      "url": "https://marketplace.antigravity.dev",
+      "proxy": "",
+      "ssl_strict": true
+    },
+
+    "installed": [
+      {
+        "id": "antigravity.kimi-code",
+        "enabled": true,
+        "version": "1.0.0"
+      },
+      {
+        "id": "antigravity.git-tools",
+        "enabled": true,
+        "version": "1.0.0"
+      },
+      {
+        "id": "antigravity.terminal-plus",
+        "enabled": true,
+        "version": "1.0.0"
+      }
+    ]
+  },
+
+  "keybindings": {
+    "_comment": "Keyboard shortcuts",
+
+    "general": {
+      "use_default": true,
+      "keymap": "default"
+    },
+
+    "shortcuts": [
+      {
+        "key": "ctrl+shift+a",
+        "command": "kimi_code.open_chat",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+shift+i",
+        "command": "kimi_code.inline_suggest",
+        "when": "editorTextFocus && !editorReadonly"
+      },
+      {
+        "key": "ctrl+shift+e",
+        "command": "kimi_code.explain_code",
+        "when": "editorHasSelection"
+      },
+      {
+        "key": "ctrl+shift+r",
+        "command": "kimi_code.refactor_code",
+        "when": "editorHasSelection && !editorReadonly"
+      },
+      {
+        "key": "ctrl+shift+t",
+        "command": "kimi_code.generate_tests",
+        "when": "editorHasSelection && !editorReadonly"
+      }
+    ]
+  },
+
+  "performance": {
+    "_comment": "Performance optimization settings",
+
+    "general": {
+      "gpu_acceleration": true,
+      "smooth_scrolling": true,
+      "reduce_motion": false,
+      "experimental_incremental_sync": true
+    },
+
+    "memory": {
+      "max_memory": 4096,
+      "gc_interval": 30000
+    },
+
+    "cache": {
+      "enabled": true,
+      "max_size_mb": 500,
+      "ttl_seconds": 86400
+    }
+  },
+
+  "security": {
+    "_comment": "Security settings",
+
+    "general": {
+      "workspace_trust": true,
+      "confirm_trust": true,
+      "confirm_download": true,
+      "confirm_open_external": true
+    },
+
+    "extensions": {
+      "verify_signatures": true,
+      "allow_unsigned": false,
+      "report_potentially_malicious": true
+    },
+
+    "network": {
+      "strict_ssl": true,
+      "proxy_support": "override",
+      "proxy": ""
+    }
+  },
+
+  "telemetry": {
+    "_comment": "Telemetry and analytics settings",
+
+    "general": {
+      "enabled": false,
+      "crash_reporter": true,
+      "error_reporter": true
+    },
+
+    "data": {
+      "usage_data": false,
+      "performance_data": false,
+      "feature_usage": false
+    }
+  }
+}

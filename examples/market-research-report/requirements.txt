@@ -1,0 +1,30 @@
+# Market Research Report Generator Requirements
+# Install with: pip install -r requirements.txt
+
+# Document generation
+python-docx>=0.8.11
+
+# Data visualization
+matplotlib>=3.6.0
+seaborn>=0.12.0
+
+# Data processing
+pandas>=1.5.0
+numpy>=1.24.0
+
+# HTTP requests
+requests>=2.28.0
+
+# Date/time handling
+python-dateutil>=2.8.0
+
+# Data validation
+pydantic>=1.10.0
+
+# Optional: For PDF export
+# reportlab>=3.6.0
+
+# Optional: For advanced NLP sentiment analysis
+# nltk>=3.8.0
+# textblob>=0.17.0
+# transformers>=4.25.0

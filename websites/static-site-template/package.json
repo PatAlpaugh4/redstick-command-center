@@ -1,0 +1,27 @@
+{
+  "name": "static-site-template",
+  "version": "1.0.0",
+  "description": "Simple static site generator pattern - Kimi Code Template",
+  "main": "scripts/build.js",
+  "scripts": {
+    "dev": "npm run build && npm run serve",
+    "build": "node scripts/build.js",
+    "serve": "npx serve dist -p 3000",
+    "watch": "npx nodemon --watch src --ext html,md,css,js --exec 'npm run build'",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "static-site",
+    "generator",
+    "ssg",
+    "template",
+    "kimi-code"
+  ],
+  "author": "Kimi Code",
+  "license": "MIT",
+  "devDependencies": {
+    "marked": "^11.1.0",
+    "nodemon": "^3.0.2",
+    "serve": "^14.2.1"
+  }
+}

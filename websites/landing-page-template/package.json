@@ -1,0 +1,41 @@
+{
+  "name": "landing-page-template",
+  "version": "1.0.0",
+  "description": "Modern responsive landing page template for Kimi Code - HTML/CSS/JS",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx live-server --port=3000 --open=/",
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "npx postcss css/styles.css -o dist/styles.css --use autoprefixer --use cssnano",
+    "build:js": "npx terser js/main.js -o dist/main.js --compress --mangle",
+    "lint": "npx eslint js/",
+    "format": "npx prettier --write ."
+  },
+  "keywords": [
+    "landing-page",
+    "template",
+    "responsive",
+    "html",
+    "css",
+    "javascript",
+    "kimi-code"
+  ],
+  "author": "Kimi Code",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.1",
+    "eslint": "^8.55.0",
+    "live-server": "^1.2.2",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.1.1",
+    "terser": "^5.26.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}

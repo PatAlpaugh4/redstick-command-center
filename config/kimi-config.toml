@@ -1,0 +1,432 @@
+# =============================================================================
+# Kimi Code - Main Configuration File
+# =============================================================================
+# This is the primary configuration file for Kimi Code development environment.
+# It defines providers, models, tools, and behavior settings.
+#
+# Documentation: https://docs.moonshot.ai/kimi-code
+# Last Updated: 2025-01
+# =============================================================================
+
+# =============================================================================
+# GENERAL SETTINGS
+# =============================================================================
+[general]
+# Application name and version
+app_name = "Kimi Code"
+version = "1.0.0"
+
+# Default working directory for projects
+# Uses current directory if not specified
+working_directory = "./projects"
+
+# Log level: debug, info, warn, error
+log_level = "info"
+
+# Maximum number of concurrent operations
+max_concurrent_tasks = 5
+
+# Enable telemetry for usage analytics (set to false for privacy)
+telemetry_enabled = false
+
+# =============================================================================
+# KIMI API CONFIGURATION
+# =============================================================================
+[kimi]
+# Base URL for Kimi/Moonshot AI API
+# For official API: https://api.moonshot.ai/v1
+# For custom endpoints: your-custom-endpoint.com/v1
+base_url = "https://api.moonshot.ai/v1"
+
+# API Key - Load from environment variable for security
+# Set KIMI_API_KEY in your .env file
+api_key = "${KIMI_API_KEY}"
+
+# Default model for general tasks
+# Options: kimi-k2.5, kimi-k2-thinking, kimi-k2.5-long-context
+default_model = "kimi-k2.5"
+
+# Context window size in tokens
+# Kimi models support up to 256,000 tokens
+context_window = 256000
+
+# Maximum tokens per response
+max_tokens = 8192
+
+# Temperature: 0.0 (deterministic) to 2.0 (creative)
+# Lower for coding tasks, higher for creative tasks
+temperature = 0.3
+
+# Top-p sampling (nucleus sampling)
+top_p = 0.9
+
+# Enable streaming responses for real-time output
+streaming = true
+
+# =============================================================================
+# MODEL CONFIGURATIONS
+# =============================================================================
+[models]
+
+# -----------------------------------------------------------------------------
+# Kimi K2.5 - General Purpose Model
+# -----------------------------------------------------------------------------
+[models.kimi-k2_5]
+name = "kimi-k2.5"
+display_name = "Kimi K2.5"
+provider = "kimi"
+context_window = 256000
+max_tokens = 8192
+temperature = 0.3
+top_p = 0.9
+supports_vision = true
+supports_tools = true
+supports_json_mode = true
+description = "General purpose model with excellent coding capabilities"
+
+# -----------------------------------------------------------------------------
+# Kimi K2 Thinking - Reasoning Model
+# -----------------------------------------------------------------------------
+[models.kimi-k2-thinking]
+name = "kimi-k2-thinking"
+display_name = "Kimi K2 Thinking"
+provider = "kimi"
+context_window = 256000
+max_tokens = 8192
+temperature = 0.2
+top_p = 0.9
+supports_vision = true
+supports_tools = true
+supports_json_mode = true
+reasoning_enabled = true
+description = "Enhanced reasoning model for complex problem-solving"
+
+# -----------------------------------------------------------------------------
+# Kimi K2.5 Long Context - Extended Context Model
+# -----------------------------------------------------------------------------
+[models.kimi-k2_5-long]
+name = "kimi-k2.5-long-context"
+display_name = "Kimi K2.5 Long Context"
+provider = "kimi"
+context_window = 2000000  # 2M tokens
+max_tokens = 8192
+temperature = 0.3
+top_p = 0.9
+supports_vision = true
+supports_tools = true
+supports_json_mode = true
+description = "Extended context model for large codebases"
+
+# =============================================================================
+# TOOL CONFIGURATIONS
+# =============================================================================
+[tools]
+# Enable/disable tool use globally
+enabled = true
+
+# Tool approval mode:
+# - "manual": Ask for approval before each tool use
+# - "auto": Automatically approve safe operations
+# - "yolo": Auto-approve all operations (use with caution!)
+approval_mode = "auto"
+
+# List of enabled tools
+enabled_tools = [
+    "web_search",
+    "code_runner",
+    "rethink",
+    "browser_visit",
+    "browser_click",
+    "browser_scroll",
+    "file_read",
+    "file_write",
+    "file_edit",
+    "shell_execute",
+    "todo_manager",
+    "image_search",
+    "image_generate",
+    "speech_generate",
+    "data_source_query"
+]
+
+# -----------------------------------------------------------------------------
+# Web Search Tool
+# -----------------------------------------------------------------------------
+[tools.web_search]
+enabled = true
+# Search provider: google, bing, duckduckgo
+provider = "google"
+# Maximum results per search
+max_results = 10
+# Enable safe search
+safe_search = true
+# Region for search results (e.g., us, cn, eu)
+region = "us"
+
+# -----------------------------------------------------------------------------
+# Code Runner Tool
+# -----------------------------------------------------------------------------
+[tools.code_runner]
+enabled = true
+# Supported languages
+languages = ["python", "javascript", "typescript", "bash", "rust", "go"]
+# Execution timeout in seconds
+timeout = 60
+# Enable network access for code execution
+network_access = false
+# Maximum memory per execution (MB)
+max_memory = 512
+
+# -----------------------------------------------------------------------------
+# Rethink Tool (Chain of Thought)
+# -----------------------------------------------------------------------------
+[tools.rethink]
+enabled = true
+# Minimum confidence threshold for triggering rethink
+confidence_threshold = 0.7
+# Maximum rethink iterations
+max_iterations = 3
+# Enable automatic rethink on complex queries
+auto_rethink = true
+
+# -----------------------------------------------------------------------------
+# Browser Automation Tools
+# -----------------------------------------------------------------------------
+[tools.browser]
+enabled = true
+# Default browser: chromium, firefox, webkit
+browser_type = "chromium"
+# Headless mode (no GUI)
+headless = true
+# Default viewport size
+viewport_width = 1280
+viewport_height = 720
+# User agent string
+user_agent = "Mozilla/5.0 (compatible; KimiCode/1.0)"
+# Request timeout in seconds
+request_timeout = 30
+# Enable JavaScript execution
+javascript_enabled = true
+
+# -----------------------------------------------------------------------------
+# File Operations
+# -----------------------------------------------------------------------------
+[tools.file_operations]
+enabled = true
+# Allowed file extensions for reading
+allowed_extensions = [
+    ".py", ".js", ".ts", ".jsx", ".tsx", ".json", ".yaml", ".yml",
+    ".toml", ".md", ".txt", ".rs", ".go", ".java", ".cpp", ".c",
+    ".h", ".hpp", ".css", ".scss", ".html", ".xml", ".sql"
+]
+# Maximum file size to read (MB)
+max_file_size = 10
+# Enable file editing
+allow_edit = true
+# Enable file creation
+allow_create = true
+# Enable file deletion (use with caution!)
+allow_delete = false
+
+# -----------------------------------------------------------------------------
+# Shell Execution
+# -----------------------------------------------------------------------------
+[tools.shell]
+enabled = true
+# Allowed commands (empty = all allowed with approval)
+allowed_commands = ["ls", "cat", "grep", "find", "git", "npm", "pip", "python"]
+# Blocked commands (always blocked for security)
+blocked_commands = ["rm -rf /", "mkfs", "dd", "> /dev"]
+# Execution timeout in seconds
+timeout = 120
+# Require approval for commands
+require_approval = true
+
+# -----------------------------------------------------------------------------
+# Todo Manager
+# -----------------------------------------------------------------------------
+[tools.todo]
+enabled = true
+# Auto-create todos for complex tasks
+auto_create = true
+# Maximum number of active todos
+max_active = 20
+
+# -----------------------------------------------------------------------------
+# Image Tools
+# -----------------------------------------------------------------------------
+[tools.image]
+enabled = true
+# Image search configuration
+[tools.image.search]
+enabled = true
+providers = ["google", "bing"]
+max_results = 10
+
+# Image generation configuration
+[tools.image.generate]
+enabled = true
+# Default ratio: 1:1, 3:2, 2:3, 4:3, 3:4, 16:9, 9:16, 21:9
+default_ratio = "1:1"
+# Default resolution: 1K, 2K, 4K
+default_resolution = "1K"
+# Support transparent background
+transparent_background = false
+
+# -----------------------------------------------------------------------------
+# Speech Tools
+# -----------------------------------------------------------------------------
+[tools.speech]
+enabled = true
+# Default voice (see available voices with get_available_voices)
+default_voice = "alloy"
+# Output format: mp3, wav, ogg
+output_format = "mp3"
+
+# -----------------------------------------------------------------------------
+# Data Source Tools
+# -----------------------------------------------------------------------------
+[tools.data_source]
+enabled = true
+# Available data sources
+sources = ["yahoo_finance", "world_bank", "arxiv", "google_scholar"]
+# Default data source
+default_source = "yahoo_finance"
+
+# =============================================================================
+# MCP (Model Context Protocol) CONFIGURATION
+# =============================================================================
+[mcp]
+# Enable MCP integration
+enabled = true
+# MCP servers configuration file path
+servers_config = "./mcp-servers.json"
+# Auto-connect to MCP servers on startup
+auto_connect = true
+# MCP request timeout in seconds
+timeout = 30
+
+# =============================================================================
+# MULTIMODAL SETTINGS
+# =============================================================================
+[multimodal]
+# Enable image input support
+image_input = true
+# Enable audio input support
+audio_input = true
+# Enable document input support (PDF, DOCX, etc.)
+document_input = true
+# Maximum image size (MB)
+max_image_size = 20
+# Supported image formats
+image_formats = ["png", "jpg", "jpeg", "webp", "gif"]
+# Maximum document size (MB)
+max_document_size = 50
+
+# =============================================================================
+# AGENT BEHAVIOR SETTINGS
+# =============================================================================
+[agent]
+# Agent personality: professional, casual, technical, creative
+personality = "professional"
+# Response style: concise, detailed, balanced
+response_style = "balanced"
+# Code comment style: minimal, standard, extensive
+comment_style = "standard"
+# Enable proactive suggestions
+proactive_suggestions = true
+# Show thinking process
+show_thinking = false
+# Maximum response length (tokens)
+max_response_length = 4096
+
+# =============================================================================
+# APPROVAL MODES
+# =============================================================================
+[approval]
+# Default approval mode: manual, auto, yolo
+default_mode = "auto"
+
+# Auto-approve these operation types in auto mode
+[approval.auto_approve]
+file_read = true
+file_write = false
+web_search = true
+shell_execute = false
+browser_visit = true
+code_runner = true
+
+# Operations requiring manual approval
+[approval.manual]
+file_delete = true
+shell_execute = true
+database_write = true
+api_key_access = true
+
+# =============================================================================
+# PERFORMANCE SETTINGS
+# =============================================================================
+[performance]
+# Enable response caching
+cache_enabled = true
+# Cache TTL in seconds
+cache_ttl = 3600
+# Maximum cache size (MB)
+max_cache_size = 100
+# Enable request batching
+batch_requests = true
+# Batch size
+batch_size = 5
+
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+[security]
+# Enable input sanitization
+sanitize_input = true
+# Enable output filtering
+filter_output = true
+# Blocked keywords (regex patterns)
+blocked_keywords = []
+# Require confirmation for destructive operations
+confirm_destructive = true
+# Log all operations for audit
+audit_log = true
+audit_log_path = "./logs/audit.log"
+
+# =============================================================================
+# INTEGRATION SETTINGS
+# =============================================================================
+[integrations]
+# Git integration
+git_enabled = true
+# GitHub integration (requires GITHUB_TOKEN)
+github_enabled = false
+# VS Code integration
+vscode_enabled = true
+# Docker integration
+docker_enabled = false
+
+# =============================================================================
+# CUSTOM PROVIDERS (Additional AI Providers)
+# =============================================================================
+[[custom_providers]]
+name = "openai"
+base_url = "https://api.openai.com/v1"
+api_key = "${OPENAI_API_KEY}"
+default_model = "gpt-4"
+enabled = false
+
+[[custom_providers]]
+name = "anthropic"
+base_url = "https://api.anthropic.com"
+api_key = "${ANTHROPIC_API_KEY}"
+default_model = "claude-3-5-sonnet"
+enabled = false
+
+[[custom_providers]]
+name = "local"
+base_url = "http://localhost:11434/v1"
+api_key = "ollama"
+default_model = "llama3"
+enabled = false

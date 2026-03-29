@@ -1,0 +1,1215 @@
+/**
+ * Global Styles
+ * =============
+ * Global CSS styles for the Redstick Ventures Dashboard.
+ * Uses Tailwind CSS with custom design tokens.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   CSS Custom Properties (Design Tokens)
+   ============================================================================= */
+
+:root {
+  /* Background Colors */
+  --background: 15 15 26;
+  --surface: 26 26 46;
+  --surface-elevated: 35 35 55;
+  
+  /* Text Colors */
+  --text-primary: 255 255 255;
+  --text-secondary: 160 160 176;
+  --text-tertiary: 106 106 122;
+  --text-muted: 74 74 90;
+  
+  /* Accent Colors */
+  --primary: 233 69 96;
+  --primary-hover: 214 61 86;
+  --primary-active: 194 54 78;
+  
+  /* Semantic Colors */
+  --success: 16 185 129;
+  --warning: 245 158 11;
+  --error: 239 68 68;
+  --info: 59 130 246;
+  
+  /* Border Colors */
+  --border: 255 255 255;
+  --border-opacity: 0.1;
+  
+  /* Spacing (4px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-primary: 0 4px 20px -4px rgb(233 69 96 / 0.3);
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Z-Index Scale */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-skip-link: 9999;
+}
+
+/* =============================================================================
+   Base Styles
+   ============================================================================= */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    @apply antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-[#0f0f1a] text-white;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Selection */
+  ::selection {
+    @apply bg-[#e94560]/30 text-white;
+  }
+  
+  /* Focus Visible (Keyboard Navigation) */
+  :focus-visible {
+    @apply outline-none ring-2 ring-[#e94560] ring-offset-2 ring-offset-[#0f0f1a];
+  }
+  
+  /* Remove default focus for mouse users */
+  :focus:not(:focus-visible) {
+    @apply outline-none ring-0;
+  }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/20;
+  }
+}
+
+/* =============================================================================
+   Component Styles
+   ============================================================================= */
+
+@layer components {
+  /* Card Component Base */
+  .card {
+    @apply bg-[#1a1a2e] border border-white/10 rounded-xl;
+  }
+  
+  /* Button Base */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e94560] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f1a];
+    @apply disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-primary {
+    @apply btn bg-[#e94560] text-white hover:bg-[#d63d56] shadow-lg shadow-[#e94560]/20;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-white/10 text-white hover:bg-white/15;
+  }
+  
+  .btn-outline {
+    @apply btn border border-white/20 bg-transparent text-white hover:bg-white/5;
+  }
+  
+  .btn-ghost {
+    @apply btn bg-transparent text-white hover:bg-white/5;
+  }
+  
+  /* Input Base */
+  .input {
+    @apply w-full px-4 py-2 bg-[#0f0f1a] border border-white/10 rounded-lg;
+    @apply text-white placeholder-[#6a6a7a];
+    @apply focus:outline-none focus:border-[#e94560] focus:ring-2 focus:ring-[#e94560]/20;
+    @apply transition-all duration-200;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  /* Label */
+  .label {
+    @apply block text-sm font-medium text-[#a0a0b0] mb-2;
+  }
+  
+  /* Badge Base */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  /* Table Base */
+  .table-container {
+    @apply rounded-lg border border-white/10 overflow-hidden;
+  }
+  
+  .table {
+    @apply w-full text-sm;
+  }
+  
+  .table th {
+    @apply px-4 py-3 text-left font-medium text-[#a0a0b0] bg-white/5;
+  }
+  
+  .table td {
+    @apply px-4 py-3 border-t border-white/5;
+  }
+  
+  /* Modal/Dialog */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-40;
+  }
+  
+  .modal {
+    @apply fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50;
+    @apply bg-[#1a1a2e] border border-white/10 rounded-2xl shadow-2xl;
+    @apply w-full max-w-lg max-h-[90vh] overflow-y-auto;
+  }
+  
+  /* Tooltip */
+  .tooltip {
+    @apply absolute z-50 px-2 py-1 text-xs text-white bg-[#1a1a2e] border border-white/10 rounded-md shadow-lg;
+    @apply opacity-0 invisible transition-opacity duration-200;
+  }
+  
+  .tooltip-trigger:hover .tooltip,
+  .tooltip-trigger:focus-visible .tooltip {
+    @apply opacity-100 visible;
+  }
+}
+
+/* =============================================================================
+   Touch Action CSS
+   ============================================================================= */
+
+@layer utilities {
+  /* Prevent all touch actions */
+  .touch-none {
+    touch-action: none;
+  }
+  
+  /* Allow horizontal pan only */
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+  
+  /* Allow vertical pan only */
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+  
+  /* Allow both axis pan */
+  .touch-pan {
+    touch-action: pan;
+  }
+  
+  /* Allow pinch zoom */
+  .touch-pinch-zoom {
+    touch-action: pinch-zoom;
+  }
+  
+  /* Allow manipulation (pan, pinch zoom) */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Drag handle styles */
+  .drag-handle {
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .drag-handle:active,
+  .drag-handle[aria-pressed="true"] {
+    cursor: grabbing;
+  }
+  
+  /* Touch target minimum size utilities */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .touch-target-sm {
+    min-height: 32px;
+    min-width: 32px;
+  }
+  
+  .touch-target-lg {
+    min-height: 56px;
+    min-width: 56px;
+  }
+  
+  /* Increase touch area without affecting layout */
+  .touch-area-expand {
+    position: relative;
+  }
+  
+  .touch-area-expand::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    z-index: 1;
+  }
+  
+  /* Prevent text selection during touch interactions */
+  .select-none-touch {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Smooth scrolling for touch devices */
+  .scroll-smooth-touch {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Momentum scrolling for iOS */
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Disable tap highlight on mobile */
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Prevent callout on long press */
+  .callout-none {
+    -webkit-touch-callout: none;
+  }
+  
+  /* Swipe action styles */
+  .swipe-actions {
+    @apply absolute inset-y-0 flex;
+  }
+  
+  .swipe-actions-left {
+    @apply left-0;
+  }
+  
+  .swipe-actions-right {
+    @apply right-0;
+  }
+  
+  .swipe-action-btn {
+    @apply flex flex-col items-center justify-center;
+    @apply min-w-[72px] h-full px-3;
+    @apply text-white transition-colors;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/50;
+  }
+  
+  /* Pull to refresh styles */
+  .pull-indicator {
+    @apply flex items-center justify-center;
+    @apply h-16 -mt-16;
+    @apply transition-transform duration-200;
+  }
+  
+  .pull-indicator-pulling {
+    @apply text-white/50;
+  }
+  
+  .pull-indicator-ready {
+    @apply text-[#10b981];
+  }
+  
+  .pull-indicator-refreshing {
+    @apply text-[#e94560];
+  }
+}
+
+/* =============================================================================
+   Touch-Friendly Component Styles
+   ============================================================================= */
+
+@layer components {
+  /* Touch-friendly button base */
+  .btn-touch {
+    @apply inline-flex items-center justify-center;
+    @apply min-h-[44px] min-w-[44px] px-4 py-2;
+    @apply rounded-lg font-medium transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e94560];
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply tap-highlight-none;
+  }
+  
+  /* Touch-friendly icon button */
+  .btn-icon-touch {
+    @apply w-11 h-11 flex items-center justify-center;
+    @apply rounded-lg transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e94560];
+    @apply tap-highlight-none;
+  }
+  
+  /* Touch-friendly input */
+  .input-touch {
+    @apply w-full h-11 px-4;
+    @apply bg-[#0f0f1a] border border-white/10 rounded-lg;
+    @apply text-white placeholder-[#6a6a7a];
+    @apply focus:outline-none focus:border-[#e94560] focus:ring-2 focus:ring-[#e94560]/20;
+    @apply transition-all duration-200;
+    @apply tap-highlight-none;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Touch-friendly dropdown item */
+  .dropdown-item-touch {
+    @apply flex items-center gap-3;
+    @apply min-h-[44px] px-4 py-2;
+    @apply text-sm text-white/80;
+    @apply hover:bg-white/5 hover:text-white;
+    @apply focus:bg-white/5 focus:text-white focus:outline-none;
+    @apply tap-highlight-none;
+  }
+  
+  /* Touch-friendly list item */
+  .list-item-touch {
+    @apply flex items-center gap-3;
+    @apply min-h-[44px] px-4 py-3;
+    @apply border-b border-white/5 last:border-b-0;
+    @apply hover:bg-white/5;
+    @apply tap-highlight-none;
+  }
+  
+  /* Touch-friendly card with swipe */
+  .card-swipeable {
+    @apply relative overflow-hidden;
+    @apply touch-pan-y;
+  }
+  
+  /* Touch-friendly tab */
+  .tab-touch {
+    @apply flex items-center justify-center;
+    @apply min-h-[44px] px-4 py-2;
+    @apply text-sm font-medium text-white/60;
+    @apply border-b-2 border-transparent;
+    @apply hover:text-white hover:border-white/20;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e94560];
+    @apply tap-highlight-none;
+  }
+  
+  .tab-touch-active {
+    @apply text-[#e94560] border-[#e94560];
+  }
+  
+  /* Touch-friendly link */
+  .link-touch {
+    @apply inline-flex items-center;
+    @apply min-h-[44px] py-2;
+    @apply text-[#e94560] hover:underline;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e94560];
+    @apply tap-highlight-none;
+  }
+}
+
+/* =============================================================================
+   Utility Classes
+   ============================================================================= */
+
+@layer utilities {
+  /* Text Gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-[#e94560] to-[#ff6b6b] bg-clip-text text-transparent;
+  }
+  
+  /* Glass Effect */
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  /* Glow Effect */
+  .glow {
+    @apply shadow-lg shadow-[#e94560]/20;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Screen reader only */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+  
+  /* Focus ring utilities */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-[#e94560] focus:ring-offset-2 focus:ring-offset-[#0f0f1a];
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+  
+  /* Truncate utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* =============================================================================
+   Animations
+   ============================================================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* =============================================================================
+   Reduced Motion
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Keep opacity transitions but make them instant */
+  .fade-transition,
+  .opacity-transition {
+    transition-duration: 0.01ms !important;
+  }
+  
+  /* Disable specific animation classes */
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin,
+  .animate-ping {
+    animation: none !important;
+  }
+  
+  /* Parallax effects */
+  .parallax,
+  [data-parallax] {
+    transform: none !important;
+  }
+  
+  /* Carousel auto-play */
+  .carousel-auto,
+  [data-carousel="auto"] {
+    animation: none !important;
+  }
+  
+  /* Continuous animations */
+  .continuous-animate {
+    animation: none !important;
+  }
+  
+  /* Shake animations */
+  .animate-shake,
+  [class*="shake"] {
+    animation: none !important;
+  }
+}
+
+/* =============================================================================
+   High Contrast Mode Support
+   ============================================================================= */
+
+@media (prefers-contrast: high) {
+  :root {
+    /* Stronger borders */
+    --border-opacity: 0.5;
+    --color-border: rgba(255, 255, 255, 0.5);
+    
+    /* Enhanced text contrast */
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #c0c0c0;
+    
+    /* Thicker focus ring */
+    --focus-ring-width: 3px;
+    --focus-ring-offset: 3px;
+  }
+  
+  /* Increase border visibility */
+  .card, 
+  .button,
+  .input,
+  .badge {
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  /* Stronger focus indicators */
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Ensure sufficient contrast on all interactive elements */
+  .btn-primary {
+    border: 2px solid currentColor;
+  }
+  
+  /* High contrast text */
+  .text-muted,
+  .text-secondary {
+    color: #e0e0e0;
+  }
+  
+  /* Enhanced table borders */
+  .table th,
+  .table td {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* =============================================================================
+   Windows Forced Colors / High Contrast Mode
+   ============================================================================= */
+
+@media (forced-colors: active) {
+  :root {
+    /* Use system colors */
+    forced-color-adjust: none;
+  }
+  
+  /* Buttons */
+  .btn,
+  .button {
+    border: 2px solid ButtonText;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+  
+  .btn:focus-visible,
+  .button:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+  
+  /* Cards and containers */
+  .card {
+    border: 1px solid CanvasText;
+    background-color: Canvas;
+    color: CanvasText;
+  }
+  
+  /* Links */
+  a {
+    color: LinkText;
+    text-decoration: underline;
+  }
+  
+  a:visited {
+    color: VisitedText;
+  }
+  
+  a:active {
+    color: ActiveText;
+  }
+  
+  /* Form elements */
+  .input,
+  input,
+  textarea,
+  select {
+    border: 2px solid FieldText;
+    background-color: Field;
+    color: FieldText;
+  }
+  
+  /* Focus indicators */
+  :focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+  
+  /* Disabled elements */
+  [disabled],
+  .disabled {
+    border-color: GrayText;
+    color: GrayText;
+  }
+  
+  /* Selection */
+  ::selection {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* =============================================================================
+   Responsive Utilities
+   ============================================================================= */
+
+@layer utilities {
+  /* Prevent overflow */
+  .overflow-fix {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Break long text */
+  .break-words {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Hyphenation for long words */
+  .hyphens-auto {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+  }
+
+  /* Text truncation with ellipsis */
+  .truncate-multiline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-inset {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Container query support */
+  .container-query {
+    container-type: inline-size;
+  }
+
+  /* Responsive aspect ratios */
+  .aspect-video-responsive {
+    aspect-ratio: 16 / 9;
+  }
+
+  @supports not (aspect-ratio: 16 / 9) {
+    .aspect-video-responsive {
+      position: relative;
+      padding-bottom: 56.25%;
+    }
+  }
+
+  /* Dynamic viewport height support */
+  .h-dvh {
+    height: 100dvh;
+  }
+
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+
+  .max-h-dvh {
+    max-height: 100dvh;
+  }
+}
+
+/* =============================================================================
+   Container Queries
+   ============================================================================= */
+
+@supports (container-type: inline-size) {
+  .card-grid-container {
+    container-type: inline-size;
+    container-name: card-grid;
+  }
+
+  @container card-grid (min-width: 400px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @container card-grid (min-width: 768px) {
+    .card-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @container card-grid (min-width: 1024px) {
+    .card-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+/* =============================================================================
+   Landscape Mobile Optimization
+   ============================================================================= */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidebar {
+    height: auto;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .mobile-drawer {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .landscape-hidden {
+    display: none !important;
+  }
+
+  .landscape-compact {
+    padding: 0.5rem !important;
+  }
+
+  .landscape-text-sm {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* =============================================================================
+   Cross-Browser Compatibility
+   ============================================================================= */
+
+/* Safari flexbox fix */
+@supports (-webkit-touch-callout: none) {
+  .flex {
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  .flex-col {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  .flex-row {
+    -webkit-flex-direction: row;
+    flex-direction: row;
+  }
+
+  .items-center {
+    -webkit-align-items: center;
+    align-items: center;
+  }
+
+  .justify-center {
+    -webkit-justify-content: center;
+    justify-content: center;
+  }
+
+  .flex-1 {
+    -webkit-flex: 1;
+    flex: 1;
+  }
+}
+
+/* iOS momentum scroll */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS input zoom prevention */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Firefox scrollbar styling */
+@-moz-document url-prefix() {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  }
+}
+
+/* Internet Explorer/Edge legacy support */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .flex {
+    display: -ms-flexbox;
+    display: flex;
+  }
+
+  .grid {
+    display: -ms-grid;
+    display: grid;
+  }
+}
+
+/* =============================================================================
+   Table Responsive Styles
+   ============================================================================= */
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 100%;
+}
+
+/* Card table for mobile */
+@media (max-width: 639px) {
+  .table-card-mode thead {
+    display: none;
+  }
+
+  .table-card-mode tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1rem;
+  }
+
+  .table-card-mode td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .table-card-mode td:last-child {
+    border-bottom: none;
+  }
+
+  .table-card-mode td::before {
+    content: attr(data-label);
+    font-weight: 500;
+    color: #a0a0b0;
+    margin-right: 1rem;
+  }
+}
+
+/* =============================================================================
+   Chart Container Responsive
+   ============================================================================= */
+
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.chart-container-responsive {
+  height: 12rem; /* h-48 */
+}
+
+@media (min-width: 640px) {
+  .chart-container-responsive {
+    height: 16rem; /* h-64 */
+  }
+}
+
+@media (min-width: 1024px) {
+  .chart-container-responsive {
+    height: 20rem; /* h-80 */
+  }
+}
+
+/* Print styles for charts */
+@media print {
+  .chart-container {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* =============================================================================
+   Modal Responsive Improvements
+   ============================================================================= */
+
+/* Full screen on very small screens */
+@media (max-width: 374px) {
+  .modal-full-screen-xs {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* Bottom sheet style on mobile */
+@media (max-width: 639px) {
+  .modal-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    transform: none;
+    border-radius: 1rem 1rem 0 0;
+    max-height: 90vh;
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+/* =============================================================================
+   Print Styles (Enhanced)
+   ============================================================================= */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  /* Ensure charts/tables print properly */
+  .chart-container {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .table-container {
+    break-inside: avoid;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure links are visible */
+  a {
+    color: black !important;
+    text-decoration: underline;
+  }
+
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+    opacity: 0.8;
+  }
+
+  /* Remove backgrounds */
+  * {
+    background: transparent !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure text is black for readability */
+  h1, h2, h3, h4, h5, h6, p, li, td, th {
+    color: black !important;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+}
+
+/* =============================================================================
+   Focus Visible Improvements for Responsive
+   ============================================================================= */
+
+/* Larger touch targets on mobile */
+@media (pointer: coarse) {
+  .touch-target-responsive {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Increase spacing between interactive elements */
+  .touch-space > * + * {
+    margin-top: 0.75rem;
+  }
+
+  /* Remove focus rings on touch devices */
+  *:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+/* =============================================================================
+   Reduced Motion Preferences
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-bottom-sheet,
+  .mobile-drawer,
+  [class*="animate-"] {
+    animation: none !important;
+    transition: opacity 0.01ms !important;
+  }
+}
+
+/* =============================================================================
+   Dark Mode Support (if needed)
+   ============================================================================= */
+
+@media (prefers-color-scheme: dark) {
+  .system-dark-mode {
+    color-scheme: dark;
+  }
+}
